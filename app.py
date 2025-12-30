@@ -505,8 +505,16 @@ with st.sidebar:
     with st.expander("🤖 Advanced Settings", expanded=False):
         model_option = st.selectbox(
             "AI Model",
-            ["gpt-4o", "gpt-4o-mini", "gpt-4-turbo"],
-            help="gpt-4o is recommended for best quality"
+            [
+                "gpt-5.2",          # Latest - Dec 2025, instant/thinking modes
+                "gpt-5.1",          # Nov 2025, multimodal + personalities
+                "gpt-4.5",          # Feb 2025, "Orion" - largest GPT-4
+                "gpt-4o",           # GPT-4 Omni - fast and capable
+                "gpt-4o-mini",      # Faster, cheaper GPT-4
+                "o1",               # Advanced reasoning model
+                "o1-mini",          # Faster reasoning model
+            ],
+            help="gpt-5.2 is the latest (Dec 2025). gpt-4o recommended for best speed/cost balance."
         )
         
         temperature = st.slider(
