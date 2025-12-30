@@ -719,17 +719,75 @@ elif st.session_state.df is not None:
 
 if df is not None and openai_api_key:
     
-    # Success message with next step guidance
+    # Success message with prominent next step guidance
     st.markdown("""
-    <div style="background: linear-gradient(135deg, rgba(0, 202, 114, 0.1) 0%, rgba(0, 202, 114, 0.05) 100%);
-                border-left: 4px solid var(--app-success); border-radius: 8px; padding: 1rem 1.25rem; margin-bottom: 1rem;">
-        <div style="display: flex; align-items: center; gap: 0.5rem;">
-            <span style="font-size: 1.25rem;">✅</span>
-            <div>
-                <div style="font-weight: 600; color: var(--app-text-primary);">Data loaded successfully!</div>
-                <div style="font-size: 0.85rem; color: var(--app-text-secondary);">
-                    Now explore your portfolio below, or go to <strong>Single Account</strong> tab to generate a QBR.
-                </div>
+    <div style="text-align: center; padding: 1.5rem 2rem; margin-bottom: 2rem;
+                background: linear-gradient(135deg, rgba(0, 202, 114, 0.15) 0%, rgba(0, 202, 114, 0.05) 100%);
+                border-radius: 16px; border: 2px solid var(--app-success);">
+        <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">✅</div>
+        <div style="font-size: 1.5rem; font-weight: 700; color: var(--app-text-primary); margin-bottom: 0.5rem;">
+            Data Loaded Successfully!
+        </div>
+        <div style="font-size: 1rem; color: var(--app-text-secondary); max-width: 500px; margin: 0 auto;">
+            Choose what you'd like to do next:
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Prominent action cards before tabs
+    st.markdown("""
+    <style>
+    /* Make tabs more prominent */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 8px;
+        justify-content: center;
+        background: var(--app-bg-card);
+        padding: 0.75rem;
+        border-radius: 12px;
+        border: 1px solid var(--app-border);
+    }
+    .stTabs [data-baseweb="tab"] {
+        font-size: 1.1rem !important;
+        font-weight: 600 !important;
+        padding: 1rem 2rem !important;
+        border-radius: 8px !important;
+    }
+    .stTabs [aria-selected="true"] {
+        background: linear-gradient(135deg, var(--app-primary) 0%, var(--app-purple) 100%) !important;
+        color: white !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+    
+    # Action selection cards
+    st.markdown("""
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-bottom: 2rem; max-width: 900px; margin-left: auto; margin-right: auto;">
+        <div style="background: var(--app-bg-card); border-radius: 12px; padding: 1.5rem; text-align: center;
+                    border: 2px solid var(--app-border); transition: all 0.2s;">
+            <div style="font-size: 2rem; margin-bottom: 0.5rem;">🏢</div>
+            <div style="font-weight: 600; color: var(--app-text-primary); font-size: 1.1rem;">Portfolio Overview</div>
+            <div style="font-size: 0.85rem; color: var(--app-text-secondary); margin-top: 0.25rem;">
+                See all accounts at a glance
+            </div>
+        </div>
+        <div style="background: linear-gradient(135deg, rgba(97, 97, 255, 0.1) 0%, rgba(162, 93, 220, 0.1) 100%);
+                    border-radius: 12px; padding: 1.5rem; text-align: center;
+                    border: 2px solid var(--app-primary); transition: all 0.2s;">
+            <div style="font-size: 2rem; margin-bottom: 0.5rem;">👤</div>
+            <div style="font-weight: 600; color: var(--app-primary); font-size: 1.1rem;">Single Account QBR</div>
+            <div style="font-size: 0.85rem; color: var(--app-text-secondary); margin-top: 0.25rem;">
+                Generate one detailed QBR
+            </div>
+            <div style="font-size: 0.7rem; color: var(--app-primary); margin-top: 0.5rem; font-weight: 600;">
+                ⭐ RECOMMENDED
+            </div>
+        </div>
+        <div style="background: var(--app-bg-card); border-radius: 12px; padding: 1.5rem; text-align: center;
+                    border: 2px solid var(--app-border); transition: all 0.2s;">
+            <div style="font-size: 2rem; margin-bottom: 0.5rem;">📦</div>
+            <div style="font-weight: 600; color: var(--app-text-primary); font-size: 1.1rem;">Batch Generate</div>
+            <div style="font-size: 0.85rem; color: var(--app-text-secondary); margin-top: 0.25rem;">
+                Generate QBRs for all accounts
             </div>
         </div>
     </div>
@@ -757,47 +815,75 @@ if df is not None and openai_api_key:
     # -------------------------------------------------------------------------
     with view_tabs[1]:
         
-        # Guidance header
+        # Prominent centered account selector
         st.markdown("""
-        <div style="background: var(--app-bg-card); border-radius: 12px; padding: 1rem 1.25rem; 
-                    border: 1px solid var(--app-border); margin-bottom: 1rem;">
-            <div style="display: flex; align-items: center; gap: 0.75rem;">
-                <span style="font-size: 1.5rem;">👤</span>
-                <div>
-                    <div style="font-weight: 600; color: var(--app-text-primary);">Generate a Single Account QBR</div>
-                    <div style="font-size: 0.85rem; color: var(--app-text-secondary);">
-                        Select an account below, review their metrics, then click Generate to create an AI-powered QBR.
-                    </div>
-                </div>
+        <div style="text-align: center; padding: 2rem; background: linear-gradient(135deg, rgba(97, 97, 255, 0.08) 0%, rgba(162, 93, 220, 0.08) 100%);
+                    border-radius: 16px; border: 1px solid var(--app-border); margin-bottom: 2rem;">
+            <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">👤</div>
+            <div style="font-size: 1.5rem; font-weight: 700; color: var(--app-text-primary); margin-bottom: 0.5rem;">
+                Select an Account
+            </div>
+            <div style="font-size: 1rem; color: var(--app-text-secondary); max-width: 450px; margin: 0 auto 1.5rem auto;">
+                Choose a customer account to view their metrics and generate a personalized QBR
             </div>
         </div>
         """, unsafe_allow_html=True)
         
-        # Account selector with label
-        col_select, col_info = st.columns([3, 1])
-        with col_select:
+        # Centered account selector - large and prominent
+        col_spacer1, col_selector, col_spacer2 = st.columns([1, 3, 1])
+        with col_selector:
+            # Custom styling for the selectbox
+            st.markdown("""
+            <style>
+            /* Make selectbox larger and more prominent in this context */
+            [data-testid="stSelectbox"] > div > div {
+                font-size: 1.1rem;
+            }
+            </style>
+            """, unsafe_allow_html=True)
+            
             selected_account = st.selectbox(
-                "🔍 Select an Account",
+                "🔍 Choose Account",
                 options=df['account_name'].tolist(),
-                help="Choose an account to generate QBR"
+                help="Select the account you want to analyze",
+                label_visibility="collapsed"
             )
-        with col_info:
+            
+            # Show risk badge below selector
             if selected_account:
                 client_data_preview = df[df['account_name'] == selected_account].iloc[0]
                 risk = client_data_preview['risk_engine_score']
+                plan = client_data_preview['plan_type']
+                users = client_data_preview['active_users']
+                
                 if risk >= 0.6:
-                    risk_badge = ("🔴", "High Risk", "var(--app-danger)")
+                    risk_badge = ("🔴", "High Risk", "#E2445C", "rgba(226, 68, 92, 0.15)")
                 elif risk >= 0.3:
-                    risk_badge = ("🟡", "Medium", "var(--app-warning)")
+                    risk_badge = ("🟡", "Medium Risk", "#FDAB3D", "rgba(253, 171, 61, 0.15)")
                 else:
-                    risk_badge = ("🟢", "Healthy", "var(--app-success)")
+                    risk_badge = ("🟢", "Healthy", "#00CA72", "rgba(0, 202, 114, 0.15)")
+                
                 st.markdown(f"""
-                <div style="background: var(--app-bg-card); border-radius: 8px; padding: 0.75rem; 
-                            text-align: center; border: 1px solid var(--app-border); margin-top: 1.5rem;">
-                    <div style="font-size: 1.25rem;">{risk_badge[0]}</div>
-                    <div style="font-size: 0.8rem; color: {risk_badge[2]}; font-weight: 600;">{risk_badge[1]}</div>
+                <div style="display: flex; justify-content: center; gap: 1rem; margin-top: 1rem; flex-wrap: wrap;">
+                    <div style="background: {risk_badge[3]}; border-radius: 20px; padding: 0.5rem 1rem; 
+                                display: flex; align-items: center; gap: 0.5rem;">
+                        <span>{risk_badge[0]}</span>
+                        <span style="font-weight: 600; color: {risk_badge[2]};">{risk_badge[1]}</span>
+                    </div>
+                    <div style="background: var(--app-bg-card); border-radius: 20px; padding: 0.5rem 1rem; 
+                                border: 1px solid var(--app-border); display: flex; align-items: center; gap: 0.5rem;">
+                        <span>📋</span>
+                        <span style="color: var(--app-text-secondary);">{plan} Plan</span>
+                    </div>
+                    <div style="background: var(--app-bg-card); border-radius: 20px; padding: 0.5rem 1rem; 
+                                border: 1px solid var(--app-border); display: flex; align-items: center; gap: 0.5rem;">
+                        <span>👥</span>
+                        <span style="color: var(--app-text-secondary);">{users} Users</span>
+                    </div>
                 </div>
                 """, unsafe_allow_html=True)
+        
+        st.markdown("<div style='height: 1.5rem;'></div>", unsafe_allow_html=True)
         
         if selected_account:
             client_data = df[df['account_name'] == selected_account].iloc[0].to_dict()
@@ -805,25 +891,37 @@ if df is not None and openai_api_key:
             # Render metrics dashboard
             render_account_metrics(client_data)
             
-            # Generation section with prominent CTA
+            # Generation section - prominent centered CTA
             st.markdown("""
-            <div style="background: linear-gradient(135deg, rgba(97, 97, 255, 0.1) 0%, rgba(162, 93, 220, 0.1) 100%);
-                        border-radius: 12px; padding: 1.25rem; margin: 1rem 0; border: 1px solid var(--app-border);">
-                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
-                    <span style="font-size: 1.25rem;">🤖</span>
-                    <div>
-                        <div style="font-weight: 600; color: var(--app-text-primary);">Ready to generate?</div>
-                        <div style="font-size: 0.85rem; color: var(--app-text-secondary);">
-                            Click the button below to create an AI-powered Quarterly Business Review for this account.
-                        </div>
-                    </div>
+            <div style="text-align: center; padding: 2.5rem 2rem; margin: 2rem auto; max-width: 600px;
+                        background: linear-gradient(135deg, rgba(97, 97, 255, 0.12) 0%, rgba(162, 93, 220, 0.12) 100%);
+                        border-radius: 20px; border: 2px solid var(--app-primary);">
+                <div style="font-size: 3rem; margin-bottom: 0.75rem;">🤖</div>
+                <div style="font-size: 1.5rem; font-weight: 700; color: var(--app-text-primary); margin-bottom: 0.5rem;">
+                    Ready to Generate QBR?
+                </div>
+                <div style="font-size: 1rem; color: var(--app-text-secondary); max-width: 400px; margin: 0 auto 1.5rem auto;">
+                    Click below to create an AI-powered Quarterly Business Review for this account
                 </div>
             </div>
             """, unsafe_allow_html=True)
             
-            col1, col2, col3 = st.columns([2, 1, 1])
+            # Centered generate button
+            col_spacer1, col_btn, col_spacer2 = st.columns([1, 2, 1])
             
-            with col1:
+            with col_btn:
+                # Add custom styling for the generate button
+                st.markdown("""
+                <style>
+                /* Make generate button larger */
+                [data-testid="stButton"] button[kind="primary"] {
+                    font-size: 1.2rem !important;
+                    padding: 1rem 2rem !important;
+                    font-weight: 700 !important;
+                }
+                </style>
+                """, unsafe_allow_html=True)
+                
                 generate_btn = st.button(
                     "🚀 Generate QBR Report",
                     use_container_width=True,
