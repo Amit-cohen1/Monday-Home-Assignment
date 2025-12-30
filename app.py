@@ -27,6 +27,81 @@ from components.exporters import (
     get_pdf_download_data,
     export_batch_to_markdown
 )
+from typing import Tuple, List
+
+# ============================================================================
+# DATA VALIDATION
+# ============================================================================
+
+# Required columns for QBR generation
+REQUIRED_COLUMNS = [
+    'account_name',
+    'plan_type', 
+    'active_users',
+    'usage_growth_qoq',
+    'automation_adoption_pct',
+    'tickets_last_quarter',
+    'avg_response_time',
+    'nps_score',
+    'preferred_channel',
+    'scat_score',
+    'risk_engine_score',
+    'crm_notes',
+    'feedback_summary'
+]
+
+def validate_dataframe(df: pd.DataFrame) -> Tuple[bool, List[str]]:
+    """
+    Validate that the uploaded DataFrame has the required structure.
+    
+    Returns:
+        Tuple of (is_valid, list of error messages)
+    """
+    errors = []
+    
+    # Check if DataFrame is empty
+    if df is None or df.empty:
+        errors.append("The uploaded file is empty or could not be parsed.")
+        return False, errors
+    
+    # Check for required columns
+    missing_columns = [col for col in REQUIRED_COLUMNS if col not in df.columns]
+    if missing_columns:
+        errors.append(f"Missing required columns: {', '.join(missing_columns)}")
+    
+    # If we have the required columns, validate data types and values
+    if not missing_columns:
+        # Check account_name is not empty
+        if df['account_name'].isna().any() or (df['account_name'] == '').any():
+            errors.append("'account_name' column contains empty values.")
+        
+        # Check numeric columns
+        numeric_columns = [
+            ('active_users', 0, None),
+            ('usage_growth_qoq', -1, 1),
+            ('automation_adoption_pct', 0, 1),
+            ('tickets_last_quarter', 0, None),
+            ('avg_response_time', 0, None),
+            ('nps_score', 0, 10),
+            ('scat_score', 0, 100),
+            ('risk_engine_score', 0, 1)
+        ]
+        
+        for col, min_val, max_val in numeric_columns:
+            if col in df.columns:
+                # Check if column can be converted to numeric
+                try:
+                    numeric_vals = pd.to_numeric(df[col], errors='coerce')
+                    if numeric_vals.isna().all():
+                        errors.append(f"'{col}' must contain numeric values.")
+                    elif min_val is not None and (numeric_vals < min_val).any():
+                        errors.append(f"'{col}' contains values below minimum ({min_val}).")
+                    elif max_val is not None and (numeric_vals > max_val).any():
+                        errors.append(f"'{col}' contains values above maximum ({max_val}).")
+                except Exception:
+                    errors.append(f"'{col}' must contain numeric values.")
+    
+    return len(errors) == 0, errors
 
 # ============================================================================
 # PAGE CONFIGURATION
@@ -338,6 +413,19 @@ with col1:
 with col2:
     st.markdown("<div style='height: 0.5rem;'></div>", unsafe_allow_html=True)
     use_sample = st.button("📋 Use Sample Data", use_container_width=True)
+    
+    # Always show download template button
+    sample_path = Path(__file__).parent / "sample_customers_q3_2025.xlsx"
+    if sample_path.exists():
+        with open(sample_path, "rb") as f:
+            st.download_button(
+                label="📥 Download Template",
+                data=f.read(),
+                file_name="qbr_data_template.xlsx",
+                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                help="Download sample data file to see the expected format",
+                use_container_width=True
+            )
 
 # Load data
 df = None
@@ -345,22 +433,71 @@ df = None
 if use_sample:
     sample_path = Path(__file__).parent / "sample_customers_q3_2025.xlsx"
     if sample_path.exists():
-        df = pd.read_excel(sample_path)
-        st.session_state.df = df
-        st.success(f"Loaded sample data: {len(df)} accounts")
+        try:
+            temp_df = pd.read_excel(sample_path)
+            is_valid, validation_errors = validate_dataframe(temp_df)
+            if is_valid:
+                df = temp_df
+                st.session_state.df = df
+                st.success(f"Loaded sample data: {len(df)} accounts")
+            else:
+                st.error("⚠️ Sample data validation failed:")
+                for error in validation_errors:
+                    st.error(f"  • {error}")
+        except Exception as e:
+            st.error(f"Error loading sample file: {e}")
     else:
         st.error("Sample data file not found")
 
 elif uploaded_file:
     try:
         if uploaded_file.name.endswith('.csv'):
-            df = pd.read_csv(uploaded_file)
+            temp_df = pd.read_csv(uploaded_file)
         else:
-            df = pd.read_excel(uploaded_file)
-        st.session_state.df = df
-        st.success(f"Loaded {len(df)} accounts from {uploaded_file.name}")
+            temp_df = pd.read_excel(uploaded_file)
+        
+        # Validate the uploaded data
+        is_valid, validation_errors = validate_dataframe(temp_df)
+        
+        if is_valid:
+            df = temp_df
+            st.session_state.df = df
+            st.success(f"✅ Loaded {len(df)} accounts from {uploaded_file.name}")
+        else:
+            st.error("⚠️ **Data Validation Failed**")
+            st.warning("The uploaded file does not have the required structure. Please ensure your file contains the following columns:")
+            
+            # Show required columns in an expander
+            with st.expander("📋 View Required Columns", expanded=True):
+                col1, col2 = st.columns(2)
+                half = len(REQUIRED_COLUMNS) // 2
+                with col1:
+                    for col in REQUIRED_COLUMNS[:half + 1]:
+                        st.markdown(f"• `{col}`")
+                with col2:
+                    for col in REQUIRED_COLUMNS[half + 1:]:
+                        st.markdown(f"• `{col}`")
+            
+            # Show specific validation errors
+            with st.expander("🔍 View Validation Errors", expanded=True):
+                for error in validation_errors:
+                    st.error(f"• {error}")
+            
+            # Provide download button for sample data
+            sample_path = Path(__file__).parent / "sample_customers_q3_2025.xlsx"
+            if sample_path.exists():
+                with open(sample_path, "rb") as f:
+                    st.download_button(
+                        label="📥 Download Sample Data Template",
+                        data=f.read(),
+                        file_name="sample_customers_template.xlsx",
+                        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        help="Download this file to see the expected data format"
+                    )
+            
     except Exception as e:
-        st.error(f"Error loading file: {e}")
+        st.error(f"❌ Error reading file: {e}")
+        st.info("Please ensure the file is a valid CSV or Excel file.")
 
 elif st.session_state.df is not None:
     df = st.session_state.df
