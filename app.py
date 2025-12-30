@@ -115,6 +115,62 @@ st.set_page_config(
 )
 
 # ============================================================================
+# AUTHENTICATION & API KEY HANDLING
+# ============================================================================
+
+def check_password():
+    """Returns True if the user entered the correct password."""
+    # Check if password protection is configured
+    if "APP_PASSWORD" not in st.secrets:
+        # No password configured, allow access
+        return True
+    
+    if "authenticated" not in st.session_state:
+        st.session_state.authenticated = False
+    
+    if st.session_state.authenticated:
+        return True
+    
+    # Show password prompt
+    st.markdown("""
+    <div style="display: flex; justify-content: center; align-items: center; min-height: 60vh;">
+        <div style="text-align: center; max-width: 400px; padding: 2rem;">
+            <img src="https://dapulse-res.cloudinary.com/image/upload/f_auto,q_auto/remote_mondaycom_static/img/monday-logo-x2.png" 
+                 width="180" alt="monday.com" style="margin-bottom: 1.5rem;">
+            <h2 style="margin-bottom: 0.5rem;">QBR Auto-Drafter</h2>
+            <p style="color: #676879; margin-bottom: 1.5rem;">Enter password to access the application</p>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
+        password = st.text_input("Password", type="password", placeholder="Enter password...")
+        if st.button("Access App", use_container_width=True, type="primary"):
+            if password == st.secrets["APP_PASSWORD"]:
+                st.session_state.authenticated = True
+                st.rerun()
+            elif password:
+                st.error("Incorrect password. Please try again.")
+    
+    return False
+
+
+def get_openai_api_key():
+    """Get OpenAI API key from secrets."""
+    if "OPENAI_API_KEY" in st.secrets:
+        return st.secrets["OPENAI_API_KEY"]
+    return None
+
+
+# Check authentication before proceeding
+if not check_password():
+    st.stop()
+
+# Get API key from secrets
+openai_api_key = get_openai_api_key()
+
+# ============================================================================
 # CUSTOM CSS - Monday.com Branding
 # ============================================================================
 
@@ -420,58 +476,68 @@ with st.sidebar:
     </div>
     """, unsafe_allow_html=True)
     
-    st.markdown("### ⚙️ Configuration")
-    
-    # API Key input
-    openai_api_key = st.text_input(
-        "OpenAI API Key",
-        type="password",
-        help="Enter your OpenAI API key to enable AI features",
-        placeholder="sk-..."
-    )
-    
+    # API Status indicator
     if openai_api_key:
-        st.success("API Key configured")
+        st.markdown("""
+        <div style="background: rgba(0, 202, 114, 0.15); border-radius: 8px; padding: 0.5rem 0.75rem; 
+                    display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
+            <span style="color: #00CA72;">✓</span>
+            <span style="font-size: 0.85rem; color: #00CA72;">AI Ready</span>
+        </div>
+        """, unsafe_allow_html=True)
     else:
-        st.warning("Enter API key to proceed")
+        st.markdown("""
+        <div style="background: rgba(226, 68, 92, 0.15); border-radius: 8px; padding: 0.5rem 0.75rem; 
+                    margin-bottom: 1rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <span style="color: #E2445C;">⚠</span>
+                <span style="font-size: 0.85rem; color: #E2445C;">API key not configured</span>
+            </div>
+            <div style="font-size: 0.75rem; color: rgba(255,255,255,0.6); margin-top: 0.25rem;">
+                Contact administrator
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
     
     st.divider()
     
-    # Model settings
-    st.markdown("### 🤖 Model Settings")
-    
-    model_option = st.selectbox(
-        "AI Model",
-        ["gpt-4o", "gpt-4o-mini", "gpt-4-turbo"],
-        help="Select the AI model for QBR generation"
-    )
-    
-    temperature = st.slider(
-        "Creativity",
-        min_value=0.0,
-        max_value=1.0,
-        value=0.3,
-        step=0.1,
-        help="Lower = more consistent, Higher = more creative"
-    )
+    # Model settings - collapsed by default for simplicity
+    with st.expander("🤖 Advanced Settings", expanded=False):
+        model_option = st.selectbox(
+            "AI Model",
+            ["gpt-4o", "gpt-4o-mini", "gpt-4-turbo"],
+            help="gpt-4o is recommended for best quality"
+        )
+        
+        temperature = st.slider(
+            "Creativity Level",
+            min_value=0.0,
+            max_value=1.0,
+            value=0.3,
+            step=0.1,
+            help="Lower = more factual, Higher = more creative"
+        )
+        
+        st.caption("💡 Default settings work great for most cases")
     
     st.divider()
     
-    # About section
-    st.markdown("### 📖 About")
+    # Quick help section
+    st.markdown("### 💡 Quick Tips")
     st.markdown("""
-    <div style="font-size: 0.85rem; opacity: 0.8;">
-    This prototype demonstrates AI-powered QBR generation for Customer Success teams.
-    <br><br>
-    <b>Built for:</b> monday.com Innovation Builder Assessment
-    <br><br>
-    <b>Features:</b>
-    <ul style="margin-top: 0.5rem; padding-left: 1.2rem;">
-        <li>Visual dashboards</li>
-        <li>AI-generated insights</li>
-        <li>Risk classification</li>
-        <li>PDF/Markdown export</li>
-    </ul>
+    <div style="font-size: 0.8rem; opacity: 0.85; line-height: 1.5;">
+        <div style="margin-bottom: 0.75rem;">
+            <strong>1.</strong> Upload or try sample data
+        </div>
+        <div style="margin-bottom: 0.75rem;">
+            <strong>2.</strong> Go to "Single Account" tab
+        </div>
+        <div style="margin-bottom: 0.75rem;">
+            <strong>3.</strong> Click "Generate QBR"
+        </div>
+        <div>
+            <strong>4.</strong> Export as PDF or Markdown
+        </div>
     </div>
     """, unsafe_allow_html=True)
 
@@ -487,19 +553,69 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# Data Upload Section
+# Determine current step for visual indicator
+current_step = 1
+if st.session_state.df is not None:
+    current_step = 2
+    if st.session_state.generated_qbrs:
+        current_step = 3
+
+# Step indicator - simple version
+step1_style = "background: var(--app-success); border-color: var(--app-success); color: white;" if current_step > 1 else ("background: var(--app-primary); border-color: var(--app-primary); color: white;" if current_step == 1 else "background: transparent; opacity: 0.5;")
+step2_style = "background: var(--app-success); border-color: var(--app-success); color: white;" if current_step > 2 else ("background: var(--app-primary); border-color: var(--app-primary); color: white;" if current_step == 2 else "background: transparent; opacity: 0.5;")
+step3_style = "background: var(--app-primary); border-color: var(--app-primary); color: white;" if current_step == 3 else "background: transparent; opacity: 0.5;"
+
+step1_icon = "✓" if current_step > 1 else "1"
+step2_icon = "✓" if current_step > 2 else "2"
+step3_icon = "3"
+
+st.markdown(f"""
+<div style="display: flex; justify-content: center; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
+    <div style="display: flex; align-items: center; gap: 0.5rem;">
+        <div style="width: 28px; height: 28px; border-radius: 50%; {step1_style} border: 2px solid; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.8rem;">{step1_icon}</div>
+        <span style="font-size: 0.85rem; color: var(--app-text-primary); font-weight: 500;">Upload Data</span>
+    </div>
+    <div style="width: 30px; height: 2px; background: var(--app-border);"></div>
+    <div style="display: flex; align-items: center; gap: 0.5rem;">
+        <div style="width: 28px; height: 28px; border-radius: 50%; {step2_style} border: 2px solid; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.8rem;">{step2_icon}</div>
+        <span style="font-size: 0.85rem; color: var(--app-text-primary); font-weight: 500;">Select Account</span>
+    </div>
+    <div style="width: 30px; height: 2px; background: var(--app-border);"></div>
+    <div style="display: flex; align-items: center; gap: 0.5rem;">
+        <div style="width: 28px; height: 28px; border-radius: 50%; {step3_style} border: 2px solid; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.8rem;">{step3_icon}</div>
+        <span style="font-size: 0.85rem; color: var(--app-text-primary); font-weight: 500;">Generate QBR</span>
+    </div>
+</div>
+""", unsafe_allow_html=True)
+
+# Data Upload Section with clearer guidance
+st.markdown("""
+<div style="background: var(--app-bg-card); border-radius: 12px; padding: 1.25rem; 
+            border: 1px solid var(--app-border); margin-bottom: 1rem;">
+    <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+        <span style="background: var(--app-primary); color: white; width: 28px; height: 28px; 
+                    border-radius: 50%; display: flex; align-items: center; justify-content: center; 
+                    font-weight: 600; font-size: 0.85rem;">1</span>
+        <span style="font-weight: 600; color: var(--app-text-primary); font-size: 1.1rem;">Start by loading your customer data</span>
+    </div>
+    <p style="color: var(--app-text-secondary); font-size: 0.9rem; margin: 0 0 0 2.5rem;">
+        Upload an Excel or CSV file with your customer metrics, or try our sample data to explore the tool.
+    </p>
+</div>
+""", unsafe_allow_html=True)
+
 col1, col2 = st.columns([2, 1])
 
 with col1:
     uploaded_file = st.file_uploader(
         "📁 Upload Customer Data",
         type=["csv", "xlsx"],
-        help="Upload your customer dataset (Excel or CSV)"
+        help="Upload your customer dataset (Excel or CSV)",
+        label_visibility="collapsed"
     )
 
 with col2:
-    st.markdown("<div style='height: 0.5rem;'></div>", unsafe_allow_html=True)
-    use_sample = st.button("📋 Use Sample Data", use_container_width=True)
+    use_sample = st.button("🚀 Try Sample Data", use_container_width=True, type="primary")
     
     # Always show download template button
     sample_path = Path(__file__).parent / "sample_customers_q3_2025.xlsx"
@@ -595,10 +711,23 @@ elif st.session_state.df is not None:
 
 if df is not None and openai_api_key:
     
-    # View Toggle
-    st.markdown("<div style='height: 1rem;'></div>", unsafe_allow_html=True)
+    # Success message with next step guidance
+    st.markdown("""
+    <div style="background: linear-gradient(135deg, rgba(0, 202, 114, 0.1) 0%, rgba(0, 202, 114, 0.05) 100%);
+                border-left: 4px solid var(--app-success); border-radius: 8px; padding: 1rem 1.25rem; margin-bottom: 1rem;">
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <span style="font-size: 1.25rem;">✅</span>
+            <div>
+                <div style="font-weight: 600; color: var(--app-text-primary);">Data loaded successfully!</div>
+                <div style="font-size: 0.85rem; color: var(--app-text-secondary);">
+                    Now explore your portfolio below, or go to <strong>Single Account</strong> tab to generate a QBR.
+                </div>
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
     
-    view_tabs = st.tabs(["🏢 Portfolio Overview", "👤 Single Account", "📦 Batch Generate"])
+    view_tabs = st.tabs(["🏢 Portfolio Overview", "👤 Single Account QBR", "📦 Batch Generate"])
     
     # -------------------------------------------------------------------------
     # TAB 1: PORTFOLIO OVERVIEW
@@ -620,12 +749,47 @@ if df is not None and openai_api_key:
     # -------------------------------------------------------------------------
     with view_tabs[1]:
         
-        # Account selector
-        selected_account = st.selectbox(
-            "Select Account",
-            options=df['account_name'].tolist(),
-            help="Choose an account to generate QBR"
-        )
+        # Guidance header
+        st.markdown("""
+        <div style="background: var(--app-bg-card); border-radius: 12px; padding: 1rem 1.25rem; 
+                    border: 1px solid var(--app-border); margin-bottom: 1rem;">
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <span style="font-size: 1.5rem;">👤</span>
+                <div>
+                    <div style="font-weight: 600; color: var(--app-text-primary);">Generate a Single Account QBR</div>
+                    <div style="font-size: 0.85rem; color: var(--app-text-secondary);">
+                        Select an account below, review their metrics, then click Generate to create an AI-powered QBR.
+                    </div>
+                </div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # Account selector with label
+        col_select, col_info = st.columns([3, 1])
+        with col_select:
+            selected_account = st.selectbox(
+                "🔍 Select an Account",
+                options=df['account_name'].tolist(),
+                help="Choose an account to generate QBR"
+            )
+        with col_info:
+            if selected_account:
+                client_data_preview = df[df['account_name'] == selected_account].iloc[0]
+                risk = client_data_preview['risk_engine_score']
+                if risk >= 0.6:
+                    risk_badge = ("🔴", "High Risk", "var(--app-danger)")
+                elif risk >= 0.3:
+                    risk_badge = ("🟡", "Medium", "var(--app-warning)")
+                else:
+                    risk_badge = ("🟢", "Healthy", "var(--app-success)")
+                st.markdown(f"""
+                <div style="background: var(--app-bg-card); border-radius: 8px; padding: 0.75rem; 
+                            text-align: center; border: 1px solid var(--app-border); margin-top: 1.5rem;">
+                    <div style="font-size: 1.25rem;">{risk_badge[0]}</div>
+                    <div style="font-size: 0.8rem; color: {risk_badge[2]}; font-weight: 600;">{risk_badge[1]}</div>
+                </div>
+                """, unsafe_allow_html=True)
         
         if selected_account:
             client_data = df[df['account_name'] == selected_account].iloc[0].to_dict()
@@ -633,14 +797,27 @@ if df is not None and openai_api_key:
             # Render metrics dashboard
             render_account_metrics(client_data)
             
-            st.divider()
+            # Generation section with prominent CTA
+            st.markdown("""
+            <div style="background: linear-gradient(135deg, rgba(97, 97, 255, 0.1) 0%, rgba(162, 93, 220, 0.1) 100%);
+                        border-radius: 12px; padding: 1.25rem; margin: 1rem 0; border: 1px solid var(--app-border);">
+                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+                    <span style="font-size: 1.25rem;">🤖</span>
+                    <div>
+                        <div style="font-weight: 600; color: var(--app-text-primary);">Ready to generate?</div>
+                        <div style="font-size: 0.85rem; color: var(--app-text-secondary);">
+                            Click the button below to create an AI-powered Quarterly Business Review for this account.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
             
-            # Generation section
             col1, col2, col3 = st.columns([2, 1, 1])
             
             with col1:
                 generate_btn = st.button(
-                    "🚀 Generate QBR",
+                    "🚀 Generate QBR Report",
                     use_container_width=True,
                     type="primary"
                 )
@@ -789,19 +966,31 @@ if df is not None and openai_api_key:
     # TAB 3: BATCH GENERATION
     # -------------------------------------------------------------------------
     with view_tabs[2]:
+        # Guidance header
         st.markdown("""
-        <div class="batch-info-box" style="background: linear-gradient(135deg, rgba(97, 97, 255, 0.1) 0%, rgba(162, 93, 220, 0.1) 100%);
-                    border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; border: 1px solid var(--app-border);">
-            <h3 style="margin: 0 0 0.5rem 0; color: var(--app-text-primary);">📦 Batch QBR Generation</h3>
-            <p style="margin: 0; color: var(--app-text-secondary);">
-                Generate QBRs for all accounts in your dataset with one click. 
-                Perfect for preparing quarterly reviews across your entire portfolio.
-            </p>
+        <div style="background: var(--app-bg-card); border-radius: 12px; padding: 1rem 1.25rem; 
+                    border: 1px solid var(--app-border); margin-bottom: 1.5rem;">
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <span style="font-size: 1.5rem;">📦</span>
+                <div>
+                    <div style="font-weight: 600; color: var(--app-text-primary);">Batch QBR Generation</div>
+                    <div style="font-size: 0.85rem; color: var(--app-text-secondary);">
+                        Generate QBRs for multiple accounts at once. Perfect for quarterly review preparation.
+                    </div>
+                </div>
+            </div>
         </div>
         """, unsafe_allow_html=True)
         
-        # Account selection
-        st.markdown("#### Select Accounts")
+        # Step 1: Account selection
+        st.markdown("""
+        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
+            <span style="background: var(--app-primary); color: white; width: 24px; height: 24px; 
+                        border-radius: 50%; display: flex; align-items: center; justify-content: center; 
+                        font-weight: 600; font-size: 0.8rem;">1</span>
+            <span style="font-weight: 600; color: var(--app-text-primary);">Select accounts to include</span>
+        </div>
+        """, unsafe_allow_html=True)
         
         col1, col2 = st.columns([3, 1])
         
@@ -816,7 +1005,7 @@ if df is not None and openai_api_key:
         with col2:
             st.markdown(f"""
             <div style="background: var(--app-bg-card); border-radius: 8px; padding: 1rem; text-align: center;
-                        border: 1px solid var(--app-border); height: 100%;">
+                        border: 1px solid var(--app-border);">
                 <div style="font-size: 1.5rem; font-weight: 700; color: var(--app-primary);">
                     {len(selected_accounts)}
                 </div>
@@ -824,7 +1013,19 @@ if df is not None and openai_api_key:
             </div>
             """, unsafe_allow_html=True)
         
-        st.markdown("<div style='height: 1rem;'></div>", unsafe_allow_html=True)
+        # Step 2: Generate
+        st.markdown("""
+        <div style="display: flex; align-items: center; gap: 0.5rem; margin: 1.5rem 0 0.75rem 0;">
+            <span style="background: var(--app-primary); color: white; width: 24px; height: 24px; 
+                        border-radius: 50%; display: flex; align-items: center; justify-content: center; 
+                        font-weight: 600; font-size: 0.8rem;">2</span>
+            <span style="font-weight: 600; color: var(--app-text-primary);">Generate all reports</span>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # Estimate time
+        estimated_time = len(selected_accounts) * 8  # ~8 seconds per account
+        st.caption(f"⏱️ Estimated time: ~{estimated_time} seconds for {len(selected_accounts)} accounts")
         
         # Generate button
         if st.button("🚀 Generate All QBRs", use_container_width=True, type="primary"):
@@ -934,55 +1135,52 @@ if df is not None and openai_api_key:
                         st.markdown(qbr_content)
 
 elif df is not None and not openai_api_key:
-    st.warning("⚠️ Please enter your OpenAI API key in the sidebar to enable QBR generation.")
+    st.error("⚠️ OpenAI API key is not configured. Please contact the administrator to enable QBR generation.")
     
     # Still show data preview
     st.markdown("### 📊 Data Preview")
     render_portfolio_overview(df)
 
 else:
-    # Empty state
-    st.markdown("""
-    <div class="empty-state-box" style="text-align: center; padding: 4rem 2rem; background: var(--app-bg-primary); 
-                border-radius: 16px; border: 2px dashed var(--app-border);">
-        <div style="font-size: 4rem; margin-bottom: 1rem;">📊</div>
-        <h2 style="color: var(--app-text-primary); margin-bottom: 0.5rem;">Welcome to QBR Auto-Drafter</h2>
-        <p style="color: var(--app-text-secondary); max-width: 500px; margin: 0 auto;">
-            Upload your customer data or use the sample dataset to get started. 
-            Our AI will generate comprehensive Quarterly Business Reviews in seconds.
-        </p>
-        <div style="margin-top: 2rem;">
-            <span style="background: var(--app-primary); color: white; padding: 0.5rem 1rem; 
-                        border-radius: 8px; font-weight: 500;">
-                ⬆️ Upload data above to begin
-            </span>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+    # Empty state with clear guidance
+    empty_state_html = """<div class="empty-state-box" style="text-align: center; padding: 3rem 2rem; background: var(--app-bg-card); border-radius: 16px; border: 1px solid var(--app-border); box-shadow: 0 4px 24px var(--app-shadow);">
+<div style="font-size: 4rem; margin-bottom: 1rem;">👋</div>
+<h2 style="color: var(--app-text-primary); margin-bottom: 0.5rem;">Welcome to QBR Auto-Drafter</h2>
+<p style="color: var(--app-text-secondary); max-width: 550px; margin: 0 auto 1.5rem auto; line-height: 1.6;">Generate professional Quarterly Business Reviews in seconds using AI. Just upload your customer data and let us handle the rest.</p>
+<div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; margin-bottom: 2rem;">
+<div style="display: flex; align-items: center; gap: 0.5rem; color: var(--app-text-secondary); font-size: 0.9rem;"><span style="color: var(--app-success);">✓</span> No complex setup</div>
+<div style="display: flex; align-items: center; gap: 0.5rem; color: var(--app-text-secondary); font-size: 0.9rem;"><span style="color: var(--app-success);">✓</span> Export to PDF</div>
+<div style="display: flex; align-items: center; gap: 0.5rem; color: var(--app-text-secondary); font-size: 0.9rem;"><span style="color: var(--app-success);">✓</span> Risk detection built-in</div>
+</div>
+<div style="background: linear-gradient(135deg, rgba(97, 97, 255, 0.1) 0%, rgba(162, 93, 220, 0.1) 100%); border-radius: 12px; padding: 1.5rem; max-width: 400px; margin: 0 auto;">
+<div style="font-weight: 600; color: var(--app-text-primary); margin-bottom: 0.5rem;">👆 Get started above</div>
+<div style="font-size: 0.9rem; color: var(--app-text-secondary);">Upload a CSV/Excel file with customer data, or click <strong>Try Sample Data</strong> to explore with demo data.</div>
+</div>
+</div>"""
+    st.markdown(empty_state_html, unsafe_allow_html=True)
     
-    # Feature highlights - rendered as a single HTML block to ensure consistent layout
-    st.markdown("""
-    <div style="height: 2rem;"></div>
-    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem;">
-        <div style="background: var(--app-bg-card); border-radius: 12px; padding: 1.5rem; text-align: center; border: 1px solid var(--app-border);">
-            <div style="font-size: 2rem; margin-bottom: 0.5rem;">📈</div>
-            <div style="font-weight: 600; color: var(--app-text-primary);">Visual Dashboards</div>
-            <div style="font-size: 0.85rem; color: var(--app-text-secondary); margin-top: 0.25rem;">Interactive charts and metrics</div>
-        </div>
-        <div style="background: var(--app-bg-card); border-radius: 12px; padding: 1.5rem; text-align: center; border: 1px solid var(--app-border);">
-            <div style="font-size: 2rem; margin-bottom: 0.5rem;">🤖</div>
-            <div style="font-weight: 600; color: var(--app-text-primary);">AI Insights</div>
-            <div style="font-size: 0.85rem; color: var(--app-text-secondary); margin-top: 0.25rem;">GPT-4 powered analysis</div>
-        </div>
-        <div style="background: var(--app-bg-card); border-radius: 12px; padding: 1.5rem; text-align: center; border: 1px solid var(--app-border);">
-            <div style="font-size: 2rem; margin-bottom: 0.5rem;">⚠️</div>
-            <div style="font-weight: 600; color: var(--app-text-primary);">Risk Detection</div>
-            <div style="font-size: 0.85rem; color: var(--app-text-secondary); margin-top: 0.25rem;">Automatic churn signals</div>
-        </div>
-        <div style="background: var(--app-bg-card); border-radius: 12px; padding: 1.5rem; text-align: center; border: 1px solid var(--app-border);">
-            <div style="font-size: 2rem; margin-bottom: 0.5rem;">📄</div>
-            <div style="font-weight: 600; color: var(--app-text-primary);">Export Ready</div>
-            <div style="font-size: 0.85rem; color: var(--app-text-secondary); margin-top: 0.25rem;">PDF & Markdown output</div>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+    # How it works section
+    how_it_works_html = """<div style="margin-top: 2rem;">
+<h3 style="text-align: center; color: var(--app-text-primary); margin-bottom: 1.5rem;">How it works</h3>
+<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem;">
+<div style="background: var(--app-bg-card); border-radius: 12px; padding: 1.5rem; text-align: center; border: 1px solid var(--app-border); position: relative;">
+<div style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--app-primary); color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.8rem;">1</div>
+<div style="font-size: 2rem; margin: 0.5rem 0;">📁</div>
+<div style="font-weight: 600; color: var(--app-text-primary);">Upload Data</div>
+<div style="font-size: 0.85rem; color: var(--app-text-secondary); margin-top: 0.25rem;">Import your customer metrics from Excel or CSV</div>
+</div>
+<div style="background: var(--app-bg-card); border-radius: 12px; padding: 1.5rem; text-align: center; border: 1px solid var(--app-border); position: relative;">
+<div style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--app-primary); color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.8rem;">2</div>
+<div style="font-size: 2rem; margin: 0.5rem 0;">🤖</div>
+<div style="font-weight: 600; color: var(--app-text-primary);">AI Analysis</div>
+<div style="font-size: 0.85rem; color: var(--app-text-secondary); margin-top: 0.25rem;">GPT-4 analyzes metrics and generates insights</div>
+</div>
+<div style="background: var(--app-bg-card); border-radius: 12px; padding: 1.5rem; text-align: center; border: 1px solid var(--app-border); position: relative;">
+<div style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--app-primary); color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.8rem;">3</div>
+<div style="font-size: 2rem; margin: 0.5rem 0;">📄</div>
+<div style="font-weight: 600; color: var(--app-text-primary);">Export & Share</div>
+<div style="font-size: 0.85rem; color: var(--app-text-secondary); margin-top: 0.25rem;">Download as PDF or Markdown to share with clients</div>
+</div>
+</div>
+</div>"""
+    st.markdown(how_it_works_html, unsafe_allow_html=True)

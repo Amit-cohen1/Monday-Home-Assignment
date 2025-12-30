@@ -36,6 +36,29 @@ YOUR CONSTRAINTS:
 4. Tailor recommendations to the specific plan type and usage patterns
 5. Use monday.com's voice: professional yet approachable, data-driven yet empathetic
 
+## CRITICAL BUSINESS RULES (MUST FOLLOW):
+
+1. **UPSELL TRIGGER**: If Plan is "Basic" AND Tickets > 10 AND Automation < 30%, you MUST recommend 
+   upgrading to "Standard" or "Pro" plan to reduce manual workload. Do NOT just suggest "training" - 
+   these customers are hitting plan limitations.
+
+2. **MONDAY.COM SPECIFICITY**: When recommending solutions, ALWAYS mention specific monday.com features:
+   - For forms/intake: "monday Workforms"
+   - For automation: "Automations Center" or "monday AI"
+   - For visibility: "Dashboards" or "monday Workdocs"
+   - For integrations: name specific integrations (Slack, Zoom, Salesforce, etc.)
+
+3. **ACTION OVER ANALYSIS**: Never suggest "feasibility studies" or "exploring options". Instead:
+   - Say "Activate [feature]" not "Consider using [feature]"
+   - Say "Schedule a demo of [feature]" not "Look into [feature]"
+   - Say "Enable automations for [workflow]" not "Assess automation opportunities"
+
+4. **STRATEGIC ADVISOR TONE**: Connect problems to business impact to create urgency:
+   - High tickets = wasted support costs + frustrated users
+   - Low automation = manual hours that could be saved
+   - Declining usage = at-risk renewal revenue
+   Frame recommendations as solving business problems, not just improving metrics.
+
 OUTPUT FORMAT: Always use clean Markdown with proper headers and bullet points."""
 
 
@@ -52,6 +75,7 @@ INSIGHT_EXTRACTOR_PROMPT = """Analyze the following customer account data and ex
 - Usage Growth (QoQ): {usage_growth_qoq}% 
 - Automation Adoption: {automation_adoption_pct}%
 - Support Tickets (Last Quarter): {tickets_last_quarter}
+- Tickets Per User: {tickets_per_user:.2f} (ratio of tickets to active users - lower is better, >0.3 indicates support burden)
 - Average Response Time: {avg_response_time} hours
 - NPS Score: {nps_score}/10
 - Preferred Channel: {preferred_channel}
@@ -70,8 +94,18 @@ Identify and categorize insights into:
 3. **OPPORTUNITIES** - Upsell/cross-sell potential based on behavior
 4. **ACTION ITEMS** - Immediate steps the CSM should take
 
-For each insight, cite the specific data point that supports it.
-Be precise and avoid generic observations."""
+## CRITICAL CHECK - PLAN UPGRADE SIGNAL:
+⚠️ If Plan = "Basic" AND Tickets > 10 AND Automation < 30%:
+→ Flag this as a PRIMARY OPPORTUNITY: "Plan upgrade to Standard/Pro"
+→ Explain: Customer is hitting Basic plan limitations, doing manual work that automations could handle
+→ This is NOT a training issue - recommend the upgrade
+
+For each insight:
+- Cite the specific data point that supports it
+- Name specific monday.com features that could help (Automations Center, monday Workforms, Dashboards, monday AI)
+- Quantify business impact where possible (hours saved, cost reduction)
+
+Be precise and avoid generic observations. Be a strategic advisor, not a passive reporter."""
 
 
 # ============================================================================
@@ -123,11 +157,20 @@ Each recommendation must be DIRECTLY tied to a specific data point.
 - Plan: {plan_type} | Users: {active_users}
 - Growth: {usage_growth_qoq}% | Automation: {automation_adoption_pct}%
 - Risk Score: {risk_engine_score} | NPS: {nps_score}
-- Tickets: {tickets_last_quarter} | Response Time: {avg_response_time}h
+- Tickets: {tickets_last_quarter} | Tickets Per User: {tickets_per_user:.2f} (>0.3 = high support burden)
+- Response Time: {avg_response_time}h
 
 ## CUSTOMER VOICE
 Feedback: {feedback_summary}
 CRM Notes: {crm_notes}
+
+## CRITICAL BUSINESS RULES (MUST CHECK FIRST):
+
+⚠️ **MANDATORY UPSELL CHECK**: 
+If Plan = "Basic" AND Tickets > 10 AND Automation < 30%:
+→ Your FIRST recommendation MUST be upgrading to "Standard" or "Pro" plan
+→ Frame it as: "Your team is spending X hours on manual work that automations could eliminate"
+→ Do NOT just suggest training - this customer has outgrown their plan
 
 ## RECOMMENDATION FRAMEWORK
 
@@ -135,9 +178,10 @@ Generate exactly 3 recommendations following this structure:
 
 ### Recommendation 1: [Title]
 - **Data Signal**: [Cite the specific metric or feedback that drives this]
-- **Action**: [Specific, actionable next step]
-- **Expected Outcome**: [What success looks like]
-- **Owner**: CSM / Product / Support
+- **Action**: [Specific, actionable next step - use verbs like "Activate", "Enable", "Schedule demo for"]
+- **monday.com Feature**: [Name the specific feature: Automations Center, monday Workforms, Dashboards, monday AI, etc.]
+- **Business Impact**: [Connect to money/time saved, e.g., "Reduce support load by ~40%"]
+- **Owner**: CSM / CSM & Client / Product / Support (Never assign to "Client" or "Customer" alone - if client involvement needed, use "CSM & Client")
 
 ### Recommendation 2: [Title]
 ...
@@ -148,15 +192,19 @@ Generate exactly 3 recommendations following this structure:
 ## RECOMMENDATION PRIORITIES BY RISK LEVEL
 
 If risk_engine_score > 0.5:
-  → Focus on RETENTION: Address pain points, escalate blockers, offer success sessions
+  → Focus on RETENTION: Activate features that solve immediate pain points, schedule urgent success call
   
 If risk_engine_score 0.3-0.5:
-  → Focus on ENGAGEMENT: Increase touchpoints, showcase value, address feedback
+  → Focus on ENGAGEMENT: Enable underutilized features, demonstrate ROI with Dashboards
   
 If risk_engine_score < 0.3:
-  → Focus on EXPANSION: Upsell features, case study opportunity, referral program
+  → Focus on EXPANSION: Upsell to higher tier, activate advanced features (monday AI, integrations)
 
-Match recommendations to the appropriate priority level."""
+## LANGUAGE RULES
+- Never say "consider" or "explore" - say "activate" or "enable"
+- Never suggest "feasibility studies" - suggest "scheduling a demo" or "piloting"
+- Always quantify impact when possible (hours saved, % reduction, cost avoided)
+- Be a strategic advisor who creates urgency, not a passive reporter"""
 
 
 # ============================================================================
@@ -174,6 +222,7 @@ FULL_QBR_PROMPT = """Generate a complete Quarterly Business Review (QBR) documen
 | Usage Growth (QoQ) | {usage_growth_qoq}% |
 | Automation Adoption | {automation_adoption_pct}% |
 | Support Tickets | {tickets_last_quarter} |
+| Tickets Per User | {tickets_per_user:.2f} (lower is better; >0.3 indicates high support burden) |
 | Avg Response Time | {avg_response_time}h |
 | NPS Score | {nps_score}/10 |
 | Preferred Channel | {preferred_channel} |
@@ -209,12 +258,40 @@ Generate the QBR with these sections:
 - Provide 3 data-grounded recommendations
 - Each should have: What, Why (data signal), and Expected Impact
 - Prioritize based on risk level
+- **Name specific monday.com features** (Automations Center, monday Workforms, Dashboards, monday AI)
+- **Use action language**: "Activate", "Enable", "Schedule demo" - never "consider" or "explore"
 
 ### 📅 NEXT STEPS
 - 2-3 concrete action items with suggested timeline
-- Include who owns each action (CSM, Customer, Product team)
+- Include who owns each action: CSM, CSM & Client, Product, or Support
+- NEVER assign tasks to "Client" or "Customer" alone - if client involvement is needed, use "CSM & Client"
+- Be specific: "Schedule 30-min Automations Center walkthrough" not "Discuss automation options"
 
 ---
+
+## CRITICAL BUSINESS RULES (MUST CHECK):
+
+⚠️ **MANDATORY UPSELL LOGIC**:
+IF Plan = "Basic" AND Tickets > 10 AND Automation < 30%:
+→ You MUST recommend upgrading to "Standard" or "Pro" plan as a top recommendation
+→ Explain: High ticket volume + low automation = team is doing manual work that the platform could automate
+→ This is NOT a training issue - this customer has outgrown Basic plan limitations
+→ Do NOT just suggest "training" or "best practices" - recommend the plan upgrade
+
+## MONDAY.COM FEATURE REFERENCES
+When recommending solutions, use these specific feature names:
+- Workflow automation → "Automations Center"
+- Forms/intake → "monday Workforms"  
+- AI assistance → "monday AI"
+- Reporting → "Dashboards"
+- Documentation → "monday Workdocs"
+- Integrations → Name specific ones (Slack, Zoom, Salesforce, Jira, etc.)
+
+## STRATEGIC ADVISOR TONE
+- Connect metrics to business impact (money, time, risk)
+- High tickets = "wasted support costs and frustrated team members"
+- Low automation = "hours of manual work that could be automated"
+- Create urgency for action, don't just report observations
 
 ## FORMATTING RULES
 - Use Markdown headers (##, ###)
@@ -264,6 +341,11 @@ def get_full_qbr_prompt(client_data: Dict[str, Any]) -> str:
     # Merge with provided data
     formatted_data = {**defaults, **client_data}
     
+    # Calculate tickets per user ratio
+    users = formatted_data.get('active_users', 0)
+    tickets = formatted_data.get('tickets_last_quarter', 0)
+    formatted_data['tickets_per_user'] = tickets / users if users > 0 else 0
+    
     # Convert decimal percentages to display percentages
     if isinstance(formatted_data['usage_growth_qoq'], float) and abs(formatted_data['usage_growth_qoq']) <= 1:
         formatted_data['usage_growth_qoq'] = formatted_data['usage_growth_qoq'] * 100
@@ -294,6 +376,11 @@ def get_insight_prompt(client_data: Dict[str, Any]) -> str:
     
     formatted_data = {**defaults, **client_data}
     
+    # Calculate tickets per user ratio
+    users = formatted_data.get('active_users', 0)
+    tickets = formatted_data.get('tickets_last_quarter', 0)
+    formatted_data['tickets_per_user'] = tickets / users if users > 0 else 0
+    
     if isinstance(formatted_data['usage_growth_qoq'], float) and abs(formatted_data['usage_growth_qoq']) <= 1:
         formatted_data['usage_growth_qoq'] = formatted_data['usage_growth_qoq'] * 100
     
@@ -320,6 +407,11 @@ def get_recommendation_prompt(client_data: Dict[str, Any]) -> str:
     }
     
     formatted_data = {**defaults, **client_data}
+    
+    # Calculate tickets per user ratio
+    users = formatted_data.get('active_users', 0)
+    tickets = formatted_data.get('tickets_last_quarter', 0)
+    formatted_data['tickets_per_user'] = tickets / users if users > 0 else 0
     
     if isinstance(formatted_data['usage_growth_qoq'], float) and abs(formatted_data['usage_growth_qoq']) <= 1:
         formatted_data['usage_growth_qoq'] = formatted_data['usage_growth_qoq'] * 100

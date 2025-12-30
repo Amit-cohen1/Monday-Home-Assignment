@@ -75,8 +75,8 @@ def create_risk_gauge(risk_score: float, account_name: str = "") -> go.Figure:
     fig.update_layout(
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
-        height=200,
-        margin=dict(l=10, r=10, t=50, b=10)
+        height=220,
+        margin=dict(l=20, r=20, t=50, b=20)
     )
     
     return fig
@@ -115,8 +115,8 @@ def create_health_gauge(scat_score: float) -> go.Figure:
     fig.update_layout(
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
-        height=200,
-        margin=dict(l=10, r=10, t=50, b=10)
+        height=220,
+        margin=dict(l=20, r=20, t=50, b=20)
     )
     
     return fig
@@ -146,8 +146,8 @@ def create_nps_indicator(nps_score: float) -> go.Figure:
     fig.update_layout(
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
-        height=200,
-        margin=dict(l=10, r=10, t=50, b=10)
+        height=220,
+        margin=dict(l=20, r=20, t=50, b=20)
     )
     
     return fig
@@ -159,24 +159,32 @@ def create_usage_growth_chart(growth_pct: float, account_name: str) -> go.Figure
     
     fig = go.Figure(go.Bar(
         x=[growth_pct * 100],
-        y=[''],
+        y=['Growth'],
         orientation='h',
         marker_color=color,
         text=[f"{growth_pct * 100:+.1f}%"],
-        textposition='outside',
-        textfont={'size': 18, 'color': COLORS['text_primary'], 'family': 'Arial Black'}
+        textposition='inside',
+        textfont={'size': 16, 'color': 'white', 'family': 'Arial Black'},
+        insidetextanchor='middle'
     ))
     
     fig.update_layout(
+        title=dict(
+            text='Quarter-over-Quarter Growth',
+            font=dict(size=14, color=COLORS['text_secondary']),
+            x=0.5,
+            xanchor='center'
+        ),
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
-        height=80,
-        margin=dict(l=10, r=60, t=10, b=10),
+        height=150,
+        margin=dict(l=30, r=30, t=45, b=40),
         xaxis={'range': [-50, 50], 'showgrid': True, 'gridcolor': 'rgba(0,0,0,0.08)',
                'zeroline': True, 'zerolinecolor': COLORS['text_secondary'], 'zerolinewidth': 2,
-               'tickfont': {'size': 10}},
+               'tickfont': {'size': 10}, 'ticksuffix': '%'},
         yaxis={'visible': False},
-        showlegend=False
+        showlegend=False,
+        autosize=True
     )
     
     return fig
@@ -343,18 +351,41 @@ def render_account_metrics(client_data: Dict[str, Any]) -> None:
         st.plotly_chart(create_nps_indicator(client_data['nps_score']), use_container_width=True, config={'displayModeBar': False})
     
     with col4:
+        # Calculate tickets per user ratio
+        tickets = client_data['tickets_last_quarter']
+        users = client_data['active_users']
+        tickets_per_user = tickets / users if users > 0 else 0
+        
+        # Determine color based on tickets per user (lower is better)
+        if tickets_per_user <= 0.1:
+            tpu_color = COLORS['success']
+            tpu_label = "Low"
+        elif tickets_per_user <= 0.3:
+            tpu_color = COLORS['warning']
+            tpu_label = "Medium"
+        else:
+            tpu_color = COLORS['danger']
+            tpu_label = "High"
+        
         st.markdown(f"""
-        <div class="metric-card" style="background: var(--app-bg-card); border-radius: 12px; padding: 1.5rem; text-align: center;
-                    box-shadow: 0 2px 8px var(--app-shadow); border: 1px solid var(--app-border); height: 200px; display: flex;
+        <div class="metric-card" style="background: var(--app-bg-card); border-radius: 12px; padding: 1.25rem; text-align: center;
+                    box-shadow: 0 2px 8px var(--app-shadow); border: 1px solid var(--app-border); height: 220px; display: flex;
                     flex-direction: column; justify-content: center; align-items: center;">
-            <div style="font-size: 2.8rem; font-weight: 700; color: var(--app-text-primary);">
-                {client_data['tickets_last_quarter']}
+            <div style="font-size: 2.5rem; font-weight: 700; color: var(--app-text-primary);">
+                {tickets}
             </div>
-            <div style="color: var(--app-text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">
+            <div style="color: var(--app-text-secondary); font-size: 0.85rem; margin-top: 0.25rem;">
                 Support Tickets
             </div>
-            <div style="color: var(--app-text-secondary); font-size: 0.8rem; margin-top: 0.25rem;">
-                Avg Response: {client_data['avg_response_time']}h
+            <div style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--app-border); width: 100%;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-size: 0.75rem; color: var(--app-text-secondary);">Per User:</span>
+                    <span style="font-size: 0.9rem; font-weight: 600; color: {tpu_color};">{tickets_per_user:.2f} ({tpu_label})</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.25rem;">
+                    <span style="font-size: 0.75rem; color: var(--app-text-secondary);">Avg Response:</span>
+                    <span style="font-size: 0.85rem; color: var(--app-text-primary);">{client_data['avg_response_time']}h</span>
+                </div>
             </div>
         </div>
         """, unsafe_allow_html=True)
@@ -365,11 +396,6 @@ def render_account_metrics(client_data: Dict[str, Any]) -> None:
     col1, col2 = st.columns(2)
     
     with col1:
-        st.markdown(f"""
-        <div style="color: var(--app-text-secondary); font-size: 0.875rem; font-weight: 600; margin-bottom: 0.25rem;">
-            Quarter-over-Quarter Growth
-        </div>
-        """, unsafe_allow_html=True)
         st.plotly_chart(create_usage_growth_chart(client_data['usage_growth_qoq'], client_data['account_name']), 
                        use_container_width=True, config={'displayModeBar': False})
     

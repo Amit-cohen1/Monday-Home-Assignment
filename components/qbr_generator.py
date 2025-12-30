@@ -53,7 +53,7 @@ class ActionItem(BaseModel):
     action_title: str = Field(description="Brief title of the action")
     description: str = Field(description="Detailed description of what to do")
     rationale: str = Field(description="Why this action is recommended based on data")
-    owner: Literal["CSM", "Customer", "Product", "Support"] = Field(description="Who owns this action")
+    owner: Literal["CSM", "CSM & Client", "Product", "Support"] = Field(description="Who owns this action - never assign to Client alone")
     priority: Literal["immediate", "short-term", "long-term"] = Field(description="When to execute")
 
 

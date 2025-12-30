@@ -78,6 +78,7 @@ The QBR Auto-Drafter follows a layered architecture pattern with clear separatio
 │  │  • Normalize percentages (0-1 vs 0-100)             │  │
 │  │  • Classify risk level (low/medium/high)            │  │
 │  │  • Determine story type (growth/turnaround/at_risk) │  │
+│  │  • Calculate tickets per user ratio                 │  │
 │  │  • Calculate portfolio aggregates                   │  │
 │  └─────────────────────────────────────────────────────┘  │
 └────────────────────────────────────────────────────────────┘
@@ -130,8 +131,13 @@ The QBR Auto-Drafter follows a layered architecture pattern with clear separatio
 | `create_nps_indicator()` | NPS score with delta | Plotly Figure |
 | `create_radar_chart()` | Multi-account comparison | Plotly Figure |
 | `create_portfolio_risk_pie()` | Risk distribution | Plotly Figure |
-| `render_account_metrics()` | Single account dashboard | Streamlit layout |
+| `render_account_metrics()` | Single account dashboard (includes tickets per user) | Streamlit layout |
 | `render_portfolio_overview()` | Portfolio summary | Streamlit layout |
+
+**Derived Metrics**:
+| Metric | Calculation | Thresholds |
+|--------|-------------|------------|
+| Tickets Per User | `tickets_last_quarter / active_users` | ≤0.1 = Low (green), 0.1-0.3 = Medium (orange), >0.3 = High (red) |
 
 **Color Scheme**:
 ```python
