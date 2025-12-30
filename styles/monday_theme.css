@@ -1,0 +1,423 @@
+/* Monday.com Brand Theme for QBR Auto-Drafter */
+
+/* === Color Palette === */
+:root {
+    --monday-primary: #6161FF;
+    --monday-primary-dark: #4B4BCC;
+    --monday-primary-light: #8B8BFF;
+    --monday-success: #00CA72;
+    --monday-success-light: #9BFFCE;
+    --monday-warning: #FDAB3D;
+    --monday-warning-light: #FFCF8B;
+    --monday-danger: #E2445C;
+    --monday-danger-light: #FF9AAB;
+    --monday-info: #579BFC;
+    --monday-purple: #A25DDC;
+    --monday-bg-primary: #F6F7FB;
+    --monday-bg-secondary: #FFFFFF;
+    --monday-text-primary: #323338;
+    --monday-text-secondary: #676879;
+    --monday-border: #E6E9EF;
+    --monday-shadow: rgba(0, 0, 0, 0.1);
+}
+
+/* === Global Styles === */
+.stApp {
+    background: linear-gradient(135deg, #F6F7FB 0%, #ECEDF5 100%);
+}
+
+/* === Header Styling === */
+.main-header {
+    background: linear-gradient(135deg, var(--monday-primary) 0%, var(--monday-purple) 100%);
+    padding: 2rem;
+    border-radius: 16px;
+    color: white;
+    margin-bottom: 2rem;
+    box-shadow: 0 8px 32px rgba(97, 97, 255, 0.3);
+}
+
+.main-header h1 {
+    font-family: 'Figtree', 'Poppins', sans-serif;
+    font-weight: 700;
+    margin: 0;
+    font-size: 2.5rem;
+}
+
+.main-header p {
+    opacity: 0.9;
+    margin-top: 0.5rem;
+    font-size: 1.1rem;
+}
+
+/* === Card Components === */
+.metric-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 12px var(--monday-shadow);
+    border-left: 4px solid var(--monday-primary);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.metric-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px var(--monday-shadow);
+}
+
+.metric-card.success {
+    border-left-color: var(--monday-success);
+}
+
+.metric-card.warning {
+    border-left-color: var(--monday-warning);
+}
+
+.metric-card.danger {
+    border-left-color: var(--monday-danger);
+}
+
+.metric-card .metric-value {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--monday-text-primary);
+    line-height: 1;
+}
+
+.metric-card .metric-label {
+    font-size: 0.875rem;
+    color: var(--monday-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 0.5rem;
+}
+
+/* === Risk Badge Styles === */
+.risk-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+.risk-badge.low {
+    background: var(--monday-success-light);
+    color: #006644;
+}
+
+.risk-badge.medium {
+    background: var(--monday-warning-light);
+    color: #8B5A00;
+}
+
+.risk-badge.high {
+    background: var(--monday-danger-light);
+    color: #8B1A2E;
+}
+
+/* === Account Cards === */
+.account-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 8px var(--monday-shadow);
+    border: 1px solid var(--monday-border);
+    transition: all 0.2s ease;
+}
+
+.account-card:hover {
+    border-color: var(--monday-primary);
+    box-shadow: 0 4px 16px rgba(97, 97, 255, 0.15);
+}
+
+.account-card .account-name {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--monday-text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.account-card .plan-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.account-card .plan-badge.enterprise {
+    background: var(--monday-purple);
+    color: white;
+}
+
+.account-card .plan-badge.pro {
+    background: var(--monday-primary);
+    color: white;
+}
+
+.account-card .plan-badge.basic {
+    background: var(--monday-info);
+    color: white;
+}
+
+/* === QBR Output Styling === */
+/* Style markdown content in QBR column */
+[data-testid="stColumn"]:first-child .stMarkdown {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 24px var(--monday-shadow);
+    border: 1px solid var(--monday-border);
+}
+
+[data-testid="stColumn"]:first-child .stMarkdown h2 {
+    color: var(--monday-primary);
+    border-bottom: 2px solid var(--monday-border);
+    padding-bottom: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+[data-testid="stColumn"]:first-child .stMarkdown h3 {
+    color: var(--monday-text-primary);
+    font-size: 1.1rem;
+    margin-top: 1.5rem;
+}
+
+[data-testid="stColumn"]:first-child .stMarkdown ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+[data-testid="stColumn"]:first-child .stMarkdown ul li {
+    position: relative;
+    padding-left: 1.5rem;
+    margin-bottom: 0.75rem;
+}
+
+[data-testid="stColumn"]:first-child .stMarkdown ul li::before {
+    content: "→";
+    position: absolute;
+    left: 0;
+    color: var(--monday-primary);
+    font-weight: bold;
+}
+
+/* === Button Styling === */
+.stButton>button {
+    background: linear-gradient(135deg, var(--monday-primary) 0%, var(--monday-primary-dark) 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 0.75rem 2rem;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(97, 97, 255, 0.3);
+}
+
+.stButton>button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(97, 97, 255, 0.4);
+}
+
+.stButton>button:active {
+    transform: translateY(0);
+}
+
+/* === Sidebar Styling === */
+[data-testid="stSidebar"] {
+    background: linear-gradient(180deg, #1F1F3D 0%, #2D2D5A 100%);
+}
+
+[data-testid="stSidebar"] .stMarkdown {
+    color: white;
+}
+
+[data-testid="stSidebar"] h1,
+[data-testid="stSidebar"] h2,
+[data-testid="stSidebar"] h3 {
+    color: white !important;
+}
+
+/* === Progress Bars === */
+.stProgress>div>div {
+    background: linear-gradient(90deg, var(--monday-primary) 0%, var(--monday-success) 100%);
+    border-radius: 10px;
+}
+
+/* === Tabs === */
+.stTabs [data-baseweb="tab-list"] {
+    gap: 8px;
+}
+
+.stTabs [data-baseweb="tab"] {
+    background: white;
+    border-radius: 8px 8px 0 0;
+    padding: 0.75rem 1.5rem;
+    border: 1px solid var(--monday-border);
+    border-bottom: none;
+}
+
+.stTabs [aria-selected="true"] {
+    background: var(--monday-primary);
+    color: white;
+}
+
+/* === Expander === */
+.streamlit-expanderHeader {
+    background: white;
+    border-radius: 8px;
+    font-weight: 600;
+}
+
+/* === Data Tables === */
+.stDataFrame {
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px var(--monday-shadow);
+}
+
+/* === Animations === */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-fade-in {
+    animation: fadeInUp 0.5s ease forwards;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.7;
+    }
+}
+
+.animate-pulse {
+    animation: pulse 2s ease-in-out infinite;
+}
+
+/* === Portfolio Health Indicator === */
+.health-indicator {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    font-weight: 700;
+    color: white;
+    margin: 0 auto;
+}
+
+.health-indicator.excellent {
+    background: linear-gradient(135deg, var(--monday-success) 0%, #00A85D 100%);
+}
+
+.health-indicator.good {
+    background: linear-gradient(135deg, var(--monday-info) 0%, #3D7AE0 100%);
+}
+
+.health-indicator.warning {
+    background: linear-gradient(135deg, var(--monday-warning) 0%, #E09200 100%);
+}
+
+.health-indicator.critical {
+    background: linear-gradient(135deg, var(--monday-danger) 0%, #B8364A 100%);
+}
+
+/* === Tooltip === */
+.tooltip {
+    position: relative;
+    cursor: help;
+}
+
+.tooltip::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--monday-text-primary);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s ease;
+}
+
+.tooltip:hover::after {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* === Plotly Chart Cards === */
+.stPlotlyChart {
+    background: white;
+    border-radius: 12px;
+    padding: 0.75rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    border: 1px solid var(--monday-border);
+}
+
+/* === Column Layout Fixes === */
+[data-testid="stHorizontalBlock"] {
+    gap: 1rem;
+    align-items: stretch;
+}
+
+[data-testid="stColumn"] {
+    display: flex;
+    flex-direction: column;
+}
+
+[data-testid="stColumn"]>div {
+    flex: 1;
+}
+
+/* Chart containers should have equal heights */
+[data-testid="stColumn"] .stPlotlyChart {
+    height: 100%;
+    min-height: 200px;
+}
+
+/* === Metric Display Row === */
+.stHorizontalBlock .stColumn .stPlotlyChart,
+.stHorizontalBlock .stColumn .stMarkdown {
+    height: 100%;
+}
+
+/* Second row cards - Growth and Automation */
+[data-testid="stHorizontalBlock"]:nth-of-type(2) [data-testid="stColumn"] {
+    background: white;
+    border-radius: 12px;
+    padding: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* Remove nested backgrounds for charts in second row */
+[data-testid="stHorizontalBlock"]:nth-of-type(2) [data-testid="stColumn"] .stPlotlyChart {
+    background: transparent;
+    box-shadow: none;
+    padding: 0;
+}
