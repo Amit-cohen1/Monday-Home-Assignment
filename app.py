@@ -119,23 +119,63 @@ st.set_page_config(
 # ============================================================================
 
 def load_custom_css():
-    """Load Monday.com branded CSS."""
+    """Load Monday.com branded CSS with dark mode support."""
     css_file = Path(__file__).parent / "styles" / "monday_theme.css"
     
-    # Inline critical CSS
+    # Load external CSS file
+    if css_file.exists():
+        with open(css_file) as f:
+            st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+    
+    # Inline critical CSS with CSS variables for dark mode support
     st.markdown("""
     <style>
     /* Import Figtree font (Monday.com's font) */
     @import url('https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&display=swap');
+    
+    /* CSS Variables for theming */
+    :root {
+        --app-primary: #6161FF;
+        --app-primary-dark: #4B4BCC;
+        --app-purple: #A25DDC;
+        --app-success: #00CA72;
+        --app-warning: #FDAB3D;
+        --app-danger: #E2445C;
+        --app-bg-primary: #F6F7FB;
+        --app-bg-card: #FFFFFF;
+        --app-text-primary: #323338;
+        --app-text-secondary: #676879;
+        --app-border: #E6E9EF;
+        --app-shadow: rgba(0, 0, 0, 0.08);
+        --app-shadow-hover: rgba(0, 0, 0, 0.12);
+    }
+    
+    @media (prefers-color-scheme: dark) {
+        :root {
+            --app-primary: #7B7BFF;
+            --app-primary-dark: #6161FF;
+            --app-purple: #B87DE8;
+            --app-success: #00E085;
+            --app-warning: #FFB84D;
+            --app-danger: #FF6B7A;
+            --app-bg-primary: #1A1A2E;
+            --app-bg-card: #1F2937;
+            --app-text-primary: #E8E8E8;
+            --app-text-secondary: #A0A0A8;
+            --app-border: #374151;
+            --app-shadow: rgba(0, 0, 0, 0.3);
+            --app-shadow-hover: rgba(0, 0, 0, 0.4);
+        }
+    }
     
     /* Global font */
     html, body, [class*="css"] {
         font-family: 'Figtree', -apple-system, BlinkMacSystemFont, sans-serif;
     }
     
-    /* Header gradient */
+    /* Header gradient - stays consistent in both modes */
     .main-header {
-        background: linear-gradient(135deg, #6161FF 0%, #A25DDC 100%);
+        background: linear-gradient(135deg, var(--app-primary) 0%, var(--app-purple) 100%);
         padding: 2rem 2.5rem;
         border-radius: 16px;
         color: white;
@@ -148,32 +188,34 @@ def load_custom_css():
         margin: 0;
         font-size: 2.2rem;
         letter-spacing: -0.5px;
+        color: white;
     }
     
     .main-header p {
         opacity: 0.9;
         margin-top: 0.5rem;
         font-size: 1.05rem;
+        color: white;
     }
     
     /* Card styling */
     .metric-card {
-        background: white;
+        background: var(--app-bg-card);
         border-radius: 12px;
         padding: 1.5rem;
-        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-        border-left: 4px solid #6161FF;
+        box-shadow: 0 2px 12px var(--app-shadow);
+        border-left: 4px solid var(--app-primary);
         transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
     
     .metric-card:hover {
         transform: translateY(-2px);
-        box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+        box-shadow: 0 8px 24px var(--app-shadow-hover);
     }
     
     /* Risk badges */
     .risk-high {
-        background: linear-gradient(135deg, #E2445C 0%, #FF6B6B 100%);
+        background: linear-gradient(135deg, var(--app-danger) 0%, #FF6B6B 100%);
         color: white;
         padding: 0.5rem 1rem;
         border-radius: 20px;
@@ -183,8 +225,8 @@ def load_custom_css():
     }
     
     .risk-medium {
-        background: linear-gradient(135deg, #FDAB3D 0%, #FFD93D 100%);
-        color: #333;
+        background: linear-gradient(135deg, var(--app-warning) 0%, #FFD93D 100%);
+        color: #1a1a1a;
         padding: 0.5rem 1rem;
         border-radius: 20px;
         font-weight: 600;
@@ -193,7 +235,7 @@ def load_custom_css():
     }
     
     .risk-low {
-        background: linear-gradient(135deg, #00CA72 0%, #00E676 100%);
+        background: linear-gradient(135deg, var(--app-success) 0%, #00E676 100%);
         color: white;
         padding: 0.5rem 1rem;
         border-radius: 20px;
@@ -220,7 +262,7 @@ def load_custom_css():
     
     /* Button styling */
     .stButton > button {
-        background: linear-gradient(135deg, #6161FF 0%, #4B4BCC 100%);
+        background: linear-gradient(135deg, var(--app-primary) 0%, var(--app-primary-dark) 100%);
         color: white;
         border: none;
         border-radius: 8px;
@@ -239,7 +281,7 @@ def load_custom_css():
     /* Tab styling */
     .stTabs [data-baseweb="tab-list"] {
         gap: 4px;
-        background: #F6F7FB;
+        background: var(--app-bg-primary);
         padding: 4px;
         border-radius: 12px;
     }
@@ -248,34 +290,36 @@ def load_custom_css():
         border-radius: 8px;
         padding: 0.5rem 1.5rem;
         font-weight: 500;
+        color: var(--app-text-primary);
     }
     
     .stTabs [aria-selected="true"] {
-        background: #6161FF !important;
+        background: var(--app-primary) !important;
         color: white !important;
     }
     
     /* Expander styling */
     .streamlit-expanderHeader {
-        background: #F6F7FB;
+        background: var(--app-bg-primary);
         border-radius: 8px;
         font-weight: 600;
+        color: var(--app-text-primary);
     }
     
     /* Success/Warning/Error messages */
     .stSuccess {
         background: linear-gradient(135deg, rgba(0, 202, 114, 0.1) 0%, rgba(0, 202, 114, 0.05) 100%);
-        border-left: 4px solid #00CA72;
+        border-left: 4px solid var(--app-success);
     }
     
     .stWarning {
         background: linear-gradient(135deg, rgba(253, 171, 61, 0.1) 0%, rgba(253, 171, 61, 0.05) 100%);
-        border-left: 4px solid #FDAB3D;
+        border-left: 4px solid var(--app-warning);
     }
     
     .stError {
         background: linear-gradient(135deg, rgba(226, 68, 92, 0.1) 0%, rgba(226, 68, 92, 0.05) 100%);
-        border-left: 4px solid #E2445C;
+        border-left: 4px solid var(--app-danger);
     }
     
     /* Hide Streamlit branding */
@@ -284,23 +328,66 @@ def load_custom_css():
     
     /* Account selector card */
     .account-selector {
-        background: white;
+        background: var(--app-bg-card);
         border-radius: 12px;
         padding: 1rem;
-        border: 2px solid #E6E9EF;
+        border: 2px solid var(--app-border);
         margin-bottom: 0.5rem;
         cursor: pointer;
         transition: all 0.2s ease;
     }
     
     .account-selector:hover {
-        border-color: #6161FF;
+        border-color: var(--app-primary);
         box-shadow: 0 4px 12px rgba(97, 97, 255, 0.15);
     }
     
     .account-selector.selected {
-        border-color: #6161FF;
+        border-color: var(--app-primary);
         background: linear-gradient(135deg, rgba(97, 97, 255, 0.05) 0%, rgba(162, 93, 220, 0.05) 100%);
+    }
+    
+    /* Dark mode specific inline element styles */
+    @media (prefers-color-scheme: dark) {
+        /* Empty state box */
+        .empty-state-box {
+            background: var(--app-bg-card) !important;
+            border-color: var(--app-border) !important;
+        }
+        
+        .empty-state-box h2, .empty-state-box p {
+            color: var(--app-text-primary) !important;
+        }
+        
+        /* Feature cards */
+        .feature-card {
+            background: var(--app-bg-card) !important;
+            border-color: var(--app-border) !important;
+        }
+        
+        .feature-card div {
+            color: var(--app-text-primary) !important;
+        }
+        
+        /* Batch generation cards */
+        .batch-info-box {
+            background: var(--app-bg-card) !important;
+            border-color: var(--app-border) !important;
+        }
+        
+        .batch-info-box h3, .batch-info-box p, .batch-info-box div {
+            color: var(--app-text-primary) !important;
+        }
+        
+        /* Result cards */
+        .result-card {
+            background: var(--app-bg-card) !important;
+            border-color: var(--app-border) !important;
+        }
+        
+        .result-card div {
+            color: var(--app-text-primary) !important;
+        }
     }
     </style>
     """, unsafe_allow_html=True)
@@ -602,7 +689,7 @@ if df is not None and openai_api_key:
                                 border-radius: 20px; font-weight: 600; font-size: 0.9rem;">
                         {emoji} {label}
                     </span>
-                    <span style="color: #676879; font-size: 0.9rem;">
+                    <span style="color: var(--app-text-secondary); font-size: 0.9rem;">
                         Confidence: {qbr_output.confidence_score:.0%}
                     </span>
                 </div>
@@ -681,18 +768,18 @@ if df is not None and openai_api_key:
                     st.markdown("### 🎯 Top Actions")
                     for rec in qbr_output.recommendations[:3]:
                         priority_colors = {
-                            'immediate': '#E2445C',
-                            'short-term': '#FDAB3D',
+                            'immediate': 'var(--app-danger)',
+                            'short-term': 'var(--app-warning)',
                             'long-term': '#579BFC'
                         }
-                        color = priority_colors.get(rec.priority, '#6161FF')
+                        color = priority_colors.get(rec.priority, 'var(--app-primary)')
                         st.markdown(f"""
-                        <div style="background: #F6F7FB; border-radius: 8px; padding: 0.75rem; 
+                        <div style="background: var(--app-bg-primary); border-radius: 8px; padding: 0.75rem; 
                                     margin-bottom: 0.5rem; border-left: 3px solid {color};">
-                            <div style="font-weight: 600; font-size: 0.85rem; color: #323338;">
+                            <div style="font-weight: 600; font-size: 0.85rem; color: var(--app-text-primary);">
                                 {rec.action_title}
                             </div>
-                            <div style="font-size: 0.75rem; color: #676879; margin-top: 0.25rem;">
+                            <div style="font-size: 0.75rem; color: var(--app-text-secondary); margin-top: 0.25rem;">
                                 {rec.owner} • {rec.priority}
                             </div>
                         </div>
@@ -703,10 +790,10 @@ if df is not None and openai_api_key:
     # -------------------------------------------------------------------------
     with view_tabs[2]:
         st.markdown("""
-        <div style="background: linear-gradient(135deg, rgba(97, 97, 255, 0.1) 0%, rgba(162, 93, 220, 0.1) 100%);
-                    border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; border: 1px solid #E6E9EF;">
-            <h3 style="margin: 0 0 0.5rem 0; color: #323338;">📦 Batch QBR Generation</h3>
-            <p style="margin: 0; color: #676879;">
+        <div class="batch-info-box" style="background: linear-gradient(135deg, rgba(97, 97, 255, 0.1) 0%, rgba(162, 93, 220, 0.1) 100%);
+                    border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; border: 1px solid var(--app-border);">
+            <h3 style="margin: 0 0 0.5rem 0; color: var(--app-text-primary);">📦 Batch QBR Generation</h3>
+            <p style="margin: 0; color: var(--app-text-secondary);">
                 Generate QBRs for all accounts in your dataset with one click. 
                 Perfect for preparing quarterly reviews across your entire portfolio.
             </p>
@@ -728,12 +815,12 @@ if df is not None and openai_api_key:
         
         with col2:
             st.markdown(f"""
-            <div style="background: white; border-radius: 8px; padding: 1rem; text-align: center;
-                        border: 1px solid #E6E9EF; height: 100%;">
-                <div style="font-size: 1.5rem; font-weight: 700; color: #6161FF;">
+            <div style="background: var(--app-bg-card); border-radius: 8px; padding: 1rem; text-align: center;
+                        border: 1px solid var(--app-border); height: 100%;">
+                <div style="font-size: 1.5rem; font-weight: 700; color: var(--app-primary);">
                     {len(selected_accounts)}
                 </div>
-                <div style="font-size: 0.75rem; color: #676879;">accounts selected</div>
+                <div style="font-size: 0.75rem; color: var(--app-text-secondary);">accounts selected</div>
             </div>
             """, unsafe_allow_html=True)
         
@@ -802,10 +889,10 @@ if df is not None and openai_api_key:
                             color = "#00CA72"
                         
                         st.markdown(f"""
-                        <div style="background: white; border-radius: 12px; padding: 1rem;
-                                    border: 1px solid #E6E9EF; text-align: center;">
+                        <div class="result-card" style="background: var(--app-bg-card); border-radius: 12px; padding: 1rem;
+                                    border: 1px solid var(--app-border); text-align: center;">
                             <div style="font-size: 1.5rem;">{badge}</div>
-                            <div style="font-weight: 600; font-size: 0.85rem; color: #323338; 
+                            <div style="font-weight: 600; font-size: 0.85rem; color: var(--app-text-primary); 
                                         margin-top: 0.5rem; overflow: hidden; text-overflow: ellipsis;">
                                 {account}
                             </div>
@@ -856,16 +943,16 @@ elif df is not None and not openai_api_key:
 else:
     # Empty state
     st.markdown("""
-    <div style="text-align: center; padding: 4rem 2rem; background: #F6F7FB; 
-                border-radius: 16px; border: 2px dashed #E6E9EF;">
+    <div class="empty-state-box" style="text-align: center; padding: 4rem 2rem; background: var(--app-bg-primary); 
+                border-radius: 16px; border: 2px dashed var(--app-border);">
         <div style="font-size: 4rem; margin-bottom: 1rem;">📊</div>
-        <h2 style="color: #323338; margin-bottom: 0.5rem;">Welcome to QBR Auto-Drafter</h2>
-        <p style="color: #676879; max-width: 500px; margin: 0 auto;">
+        <h2 style="color: var(--app-text-primary); margin-bottom: 0.5rem;">Welcome to QBR Auto-Drafter</h2>
+        <p style="color: var(--app-text-secondary); max-width: 500px; margin: 0 auto;">
             Upload your customer data or use the sample dataset to get started. 
             Our AI will generate comprehensive Quarterly Business Reviews in seconds.
         </p>
         <div style="margin-top: 2rem;">
-            <span style="background: #6161FF; color: white; padding: 0.5rem 1rem; 
+            <span style="background: var(--app-primary); color: white; padding: 0.5rem 1rem; 
                         border-radius: 8px; font-weight: 500;">
                 ⬆️ Upload data above to begin
             </span>
@@ -873,25 +960,29 @@ else:
     </div>
     """, unsafe_allow_html=True)
     
-    # Feature highlights
-    st.markdown("<div style='height: 2rem;'></div>", unsafe_allow_html=True)
-    
-    col1, col2, col3, col4 = st.columns(4)
-    
-    features = [
-        ("📈", "Visual Dashboards", "Interactive charts and metrics"),
-        ("🤖", "AI Insights", "GPT-4 powered analysis"),
-        ("⚠️", "Risk Detection", "Automatic churn signals"),
-        ("📄", "Export Ready", "PDF & Markdown output")
-    ]
-    
-    for col, (icon, title, desc) in zip([col1, col2, col3, col4], features):
-        with col:
-            st.markdown(f"""
-            <div style="background: white; border-radius: 12px; padding: 1.5rem; 
-                        text-align: center; border: 1px solid #E6E9EF;">
-                <div style="font-size: 2rem; margin-bottom: 0.5rem;">{icon}</div>
-                <div style="font-weight: 600; color: #323338;">{title}</div>
-                <div style="font-size: 0.85rem; color: #676879; margin-top: 0.25rem;">{desc}</div>
-            </div>
-            """, unsafe_allow_html=True)
+    # Feature highlights - rendered as a single HTML block to ensure consistent layout
+    st.markdown("""
+    <div style="height: 2rem;"></div>
+    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem;">
+        <div style="background: var(--app-bg-card); border-radius: 12px; padding: 1.5rem; text-align: center; border: 1px solid var(--app-border);">
+            <div style="font-size: 2rem; margin-bottom: 0.5rem;">📈</div>
+            <div style="font-weight: 600; color: var(--app-text-primary);">Visual Dashboards</div>
+            <div style="font-size: 0.85rem; color: var(--app-text-secondary); margin-top: 0.25rem;">Interactive charts and metrics</div>
+        </div>
+        <div style="background: var(--app-bg-card); border-radius: 12px; padding: 1.5rem; text-align: center; border: 1px solid var(--app-border);">
+            <div style="font-size: 2rem; margin-bottom: 0.5rem;">🤖</div>
+            <div style="font-weight: 600; color: var(--app-text-primary);">AI Insights</div>
+            <div style="font-size: 0.85rem; color: var(--app-text-secondary); margin-top: 0.25rem;">GPT-4 powered analysis</div>
+        </div>
+        <div style="background: var(--app-bg-card); border-radius: 12px; padding: 1.5rem; text-align: center; border: 1px solid var(--app-border);">
+            <div style="font-size: 2rem; margin-bottom: 0.5rem;">⚠️</div>
+            <div style="font-weight: 600; color: var(--app-text-primary);">Risk Detection</div>
+            <div style="font-size: 0.85rem; color: var(--app-text-secondary); margin-top: 0.25rem;">Automatic churn signals</div>
+        </div>
+        <div style="background: var(--app-bg-card); border-radius: 12px; padding: 1.5rem; text-align: center; border: 1px solid var(--app-border);">
+            <div style="font-size: 2rem; margin-bottom: 0.5rem;">📄</div>
+            <div style="font-weight: 600; color: var(--app-text-primary);">Export Ready</div>
+            <div style="font-size: 0.85rem; color: var(--app-text-secondary); margin-top: 0.25rem;">PDF & Markdown output</div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)

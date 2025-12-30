@@ -10,6 +10,8 @@ import pandas as pd
 from typing import Dict, Any, List
 
 # Monday.com Color Palette
+# Note: These colors are used for Plotly charts which cannot use CSS variables
+# For inline HTML styles, use CSS variables (--app-*) defined in app.py for dark mode support
 COLORS = {
     'primary': '#6161FF',
     'primary_dark': '#4B4BCC',
@@ -187,10 +189,10 @@ def create_automation_progress(adoption_pct: float) -> None:
     st.markdown(f"""
     <div style="margin: 10px 0;">
         <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-            <span style="color: {COLORS['text_secondary']}; font-size: 14px;">Automation Adoption</span>
+            <span style="color: var(--app-text-secondary); font-size: 14px;">Automation Adoption</span>
             <span style="color: {color}; font-weight: 600;">{adoption_pct * 100:.0f}%</span>
         </div>
-        <div style="background: {COLORS['bg']}; border-radius: 10px; height: 12px; overflow: hidden;">
+        <div style="background: var(--app-bg-primary); border-radius: 10px; height: 12px; overflow: hidden;">
             <div style="background: linear-gradient(90deg, {color}, {COLORS['primary']}); 
                         width: {adoption_pct * 100}%; height: 100%; border-radius: 10px;
                         transition: width 0.5s ease;"></div>
@@ -230,6 +232,12 @@ def create_radar_chart(accounts_df: pd.DataFrame) -> go.Figure:
         ))
     
     fig.update_layout(
+        title=dict(
+            text='Account Comparison',
+            font=dict(size=16, color=COLORS['text_primary']),
+            x=0.5,
+            xanchor='center'
+        ),
         polar=dict(
             radialaxis=dict(
                 visible=True,
@@ -253,7 +261,7 @@ def create_radar_chart(accounts_df: pd.DataFrame) -> go.Figure:
             x=0.5
         ),
         height=450,
-        margin=dict(l=60, r=60, t=40, b=80)
+        margin=dict(l=60, r=60, t=50, b=80)
     )
     
     return fig
@@ -289,11 +297,17 @@ def create_portfolio_risk_pie(accounts_df: pd.DataFrame) -> go.Figure:
     )
     
     fig.update_layout(
+        title=dict(
+            text='Risk Distribution',
+            font=dict(size=16, color=COLORS['text_primary']),
+            x=0.5,
+            xanchor='center'
+        ),
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
         showlegend=False,
         height=300,
-        margin=dict(l=20, r=20, t=20, b=20)
+        margin=dict(l=20, r=20, t=40, b=20)
     )
     
     return fig
@@ -330,16 +344,16 @@ def render_account_metrics(client_data: Dict[str, Any]) -> None:
     
     with col4:
         st.markdown(f"""
-        <div class="metric-card" style="background: white; border-radius: 12px; padding: 1.5rem; text-align: center;
-                    box-shadow: 0 2px 8px rgba(0,0,0,0.08); border: 1px solid #E6E9EF; height: 200px; display: flex;
+        <div class="metric-card" style="background: var(--app-bg-card); border-radius: 12px; padding: 1.5rem; text-align: center;
+                    box-shadow: 0 2px 8px var(--app-shadow); border: 1px solid var(--app-border); height: 200px; display: flex;
                     flex-direction: column; justify-content: center; align-items: center;">
-            <div style="font-size: 2.8rem; font-weight: 700; color: {COLORS['text_primary']};">
+            <div style="font-size: 2.8rem; font-weight: 700; color: var(--app-text-primary);">
                 {client_data['tickets_last_quarter']}
             </div>
-            <div style="color: {COLORS['text_secondary']}; font-size: 0.9rem; margin-top: 0.5rem;">
+            <div style="color: var(--app-text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">
                 Support Tickets
             </div>
-            <div style="color: {COLORS['text_secondary']}; font-size: 0.8rem; margin-top: 0.25rem;">
+            <div style="color: var(--app-text-secondary); font-size: 0.8rem; margin-top: 0.25rem;">
                 Avg Response: {client_data['avg_response_time']}h
             </div>
         </div>
@@ -352,7 +366,7 @@ def render_account_metrics(client_data: Dict[str, Any]) -> None:
     
     with col1:
         st.markdown(f"""
-        <div style="color: {COLORS['text_secondary']}; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.25rem;">
+        <div style="color: var(--app-text-secondary); font-size: 0.875rem; font-weight: 600; margin-bottom: 0.25rem;">
             Quarter-over-Quarter Growth
         </div>
         """, unsafe_allow_html=True)
@@ -362,9 +376,9 @@ def render_account_metrics(client_data: Dict[str, Any]) -> None:
     with col2:
         create_automation_progress(client_data['automation_adoption_pct'])
         st.markdown(f"""
-        <div style="margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid {COLORS['bg']};">
-            <div style="font-size: 0.7rem; color: {COLORS['text_secondary']}; text-transform: uppercase; letter-spacing: 0.5px;">CRM Notes</div>
-            <div style="font-size: 0.8rem; color: {COLORS['text_primary']}; margin-top: 0.4rem; 
+        <div style="margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid var(--app-border);">
+            <div style="font-size: 0.7rem; color: var(--app-text-secondary); text-transform: uppercase; letter-spacing: 0.5px;">CRM Notes</div>
+            <div style="font-size: 0.8rem; color: var(--app-text-primary); margin-top: 0.4rem; 
                         font-style: italic; line-height: 1.4;">"{client_data['crm_notes'][:120]}..."</div>
         </div>
         """, unsafe_allow_html=True)
@@ -408,26 +422,10 @@ def render_portfolio_overview(df: pd.DataFrame) -> None:
     col1, col2 = st.columns([1, 2])
     
     with col1:
-        st.markdown(f"""
-        <div style="background: white; border-radius: 12px; padding: 1rem;
-                    box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
-            <h4 style="margin: 0 0 0.5rem 0; color: {COLORS['text_primary']}; text-align: center;">
-                Risk Distribution
-            </h4>
-        """, unsafe_allow_html=True)
         st.plotly_chart(create_portfolio_risk_pie(df), use_container_width=True)
-        st.markdown("</div>", unsafe_allow_html=True)
     
     with col2:
-        st.markdown(f"""
-        <div style="background: white; border-radius: 12px; padding: 1rem;
-                    box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
-            <h4 style="margin: 0 0 0.5rem 0; color: {COLORS['text_primary']}; text-align: center;">
-                Account Comparison
-            </h4>
-        """, unsafe_allow_html=True)
         st.plotly_chart(create_radar_chart(df), use_container_width=True)
-        st.markdown("</div>", unsafe_allow_html=True)
 
 
 def render_dashboard(df: pd.DataFrame, selected_account: str = None) -> None:

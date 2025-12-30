@@ -1,6 +1,6 @@
 /* Monday.com Brand Theme for QBR Auto-Drafter */
 
-/* === Color Palette === */
+/* === Color Palette - Light Mode (Default) === */
 :root {
     --monday-primary: #6161FF;
     --monday-primary-dark: #4B4BCC;
@@ -15,15 +15,52 @@
     --monday-purple: #A25DDC;
     --monday-bg-primary: #F6F7FB;
     --monday-bg-secondary: #FFFFFF;
+    --monday-bg-card: #FFFFFF;
     --monday-text-primary: #323338;
     --monday-text-secondary: #676879;
     --monday-border: #E6E9EF;
     --monday-shadow: rgba(0, 0, 0, 0.1);
+    --monday-shadow-hover: rgba(0, 0, 0, 0.15);
+    --monday-input-bg: #FFFFFF;
+    --monday-chart-grid: rgba(0, 0, 0, 0.08);
+}
+
+/* === Dark Mode Color Palette === */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --monday-primary: #7B7BFF;
+        --monday-primary-dark: #6161FF;
+        --monday-primary-light: #9B9BFF;
+        --monday-success: #00E085;
+        --monday-success-light: #004D2E;
+        --monday-warning: #FFB84D;
+        --monday-warning-light: #4D3500;
+        --monday-danger: #FF6B7A;
+        --monday-danger-light: #4D1F28;
+        --monday-info: #6BA8FF;
+        --monday-purple: #B87DE8;
+        --monday-bg-primary: #1A1A2E;
+        --monday-bg-secondary: #16213E;
+        --monday-bg-card: #1F2937;
+        --monday-text-primary: #E8E8E8;
+        --monday-text-secondary: #A0A0A8;
+        --monday-border: #374151;
+        --monday-shadow: rgba(0, 0, 0, 0.4);
+        --monday-shadow-hover: rgba(0, 0, 0, 0.5);
+        --monday-input-bg: #1F2937;
+        --monday-chart-grid: rgba(255, 255, 255, 0.1);
+    }
 }
 
 /* === Global Styles === */
 .stApp {
-    background: linear-gradient(135deg, #F6F7FB 0%, #ECEDF5 100%);
+    background: linear-gradient(135deg, var(--monday-bg-primary) 0%, var(--monday-bg-secondary) 100%);
+}
+
+@media (prefers-color-scheme: dark) {
+    .stApp {
+        background: linear-gradient(135deg, #0F0F1A 0%, #1A1A2E 100%);
+    }
 }
 
 /* === Header Styling === */
@@ -51,7 +88,7 @@
 
 /* === Card Components === */
 .metric-card {
-    background: white;
+    background: var(--monday-bg-card);
     border-radius: 12px;
     padding: 1.5rem;
     box-shadow: 0 2px 12px var(--monday-shadow);
@@ -61,7 +98,7 @@
 
 .metric-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px var(--monday-shadow);
+    box-shadow: 0 8px 24px var(--monday-shadow-hover);
 }
 
 .metric-card.success {
@@ -118,7 +155,7 @@
 
 /* === Account Cards === */
 .account-card {
-    background: white;
+    background: var(--monday-bg-card);
     border-radius: 16px;
     padding: 1.5rem;
     margin-bottom: 1rem;
@@ -129,7 +166,7 @@
 
 .account-card:hover {
     border-color: var(--monday-primary);
-    box-shadow: 0 4px 16px rgba(97, 97, 255, 0.15);
+    box-shadow: 0 4px 16px var(--monday-shadow-hover);
 }
 
 .account-card .account-name {
@@ -166,7 +203,7 @@
 /* === QBR Output Styling === */
 /* Style markdown content in QBR column */
 [data-testid="stColumn"]:first-child .stMarkdown {
-    background: white;
+    background: var(--monday-bg-card);
     border-radius: 16px;
     padding: 1.5rem;
     box-shadow: 0 4px 24px var(--monday-shadow);
@@ -251,14 +288,16 @@
 /* === Tabs === */
 .stTabs [data-baseweb="tab-list"] {
     gap: 8px;
+    background: var(--monday-bg-primary);
 }
 
 .stTabs [data-baseweb="tab"] {
-    background: white;
+    background: var(--monday-bg-card);
     border-radius: 8px 8px 0 0;
     padding: 0.75rem 1.5rem;
     border: 1px solid var(--monday-border);
     border-bottom: none;
+    color: var(--monday-text-primary);
 }
 
 .stTabs [aria-selected="true"] {
@@ -268,9 +307,10 @@
 
 /* === Expander === */
 .streamlit-expanderHeader {
-    background: white;
+    background: var(--monday-bg-card);
     border-radius: 8px;
     font-weight: 600;
+    color: var(--monday-text-primary);
 }
 
 /* === Data Tables === */
@@ -373,10 +413,10 @@
 
 /* === Plotly Chart Cards === */
 .stPlotlyChart {
-    background: white;
+    background: var(--monday-bg-card);
     border-radius: 12px;
     padding: 0.75rem;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 2px 8px var(--monday-shadow);
     border: 1px solid var(--monday-border);
 }
 
@@ -409,10 +449,10 @@
 
 /* Second row cards - Growth and Automation */
 [data-testid="stHorizontalBlock"]:nth-of-type(2) [data-testid="stColumn"] {
-    background: white;
+    background: var(--monday-bg-card);
     border-radius: 12px;
     padding: 1rem;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 2px 8px var(--monday-shadow);
 }
 
 /* Remove nested backgrounds for charts in second row */
@@ -420,4 +460,57 @@
     background: transparent;
     box-shadow: none;
     padding: 0;
+}
+
+/* === Dark Mode Specific Overrides === */
+@media (prefers-color-scheme: dark) {
+    /* Ensure text visibility in dark mode */
+    .stMarkdown, .stMarkdown p, .stMarkdown li {
+        color: var(--monday-text-primary);
+    }
+    
+    /* Input fields */
+    .stTextInput input, .stSelectbox > div > div, .stMultiSelect > div > div {
+        background: var(--monday-input-bg);
+        color: var(--monday-text-primary);
+        border-color: var(--monday-border);
+    }
+    
+    /* File uploader */
+    [data-testid="stFileUploader"] {
+        background: var(--monday-bg-card);
+        border-color: var(--monday-border);
+    }
+    
+    /* Metrics */
+    [data-testid="stMetric"] {
+        background: var(--monday-bg-card);
+        border-radius: 8px;
+        padding: 0.5rem;
+    }
+    
+    [data-testid="stMetricValue"] {
+        color: var(--monday-text-primary);
+    }
+    
+    [data-testid="stMetricLabel"] {
+        color: var(--monday-text-secondary);
+    }
+    
+    /* Data frame */
+    .stDataFrame {
+        background: var(--monday-bg-card);
+    }
+    
+    /* Download buttons */
+    .stDownloadButton > button {
+        background: var(--monday-bg-card);
+        color: var(--monday-text-primary);
+        border: 1px solid var(--monday-border);
+    }
+    
+    .stDownloadButton > button:hover {
+        border-color: var(--monday-primary);
+        color: var(--monday-primary);
+    }
 }
