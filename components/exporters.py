@@ -335,12 +335,46 @@ def parse_markdown_to_sections(markdown: str) -> Dict[str, str]:
 
 
 def clean_text_for_pdf(text: str) -> str:
-    """Clean markdown syntax for PDF rendering."""
+    """Clean markdown syntax and Unicode characters for PDF rendering."""
     # Remove markdown formatting
     text = re.sub(r'\*\*(.+?)\*\*', r'\1', text)  # Bold
     text = re.sub(r'\*(.+?)\*', r'\1', text)       # Italic
     text = re.sub(r'`(.+?)`', r'\1', text)         # Code
     text = re.sub(r'\[(.+?)\]\(.+?\)', r'\1', text)  # Links
+    
+    # Replace Unicode characters that Helvetica doesn't support
+    unicode_replacements = {
+        '—': '-',      # Em dash
+        '–': '-',      # En dash
+        ''': "'",      # Right single quote
+        ''': "'",      # Left single quote
+        '"': '"',      # Left double quote
+        '"': '"',      # Right double quote
+        '…': '...',    # Ellipsis
+        '•': '*',      # Bullet
+        '→': '->',     # Right arrow
+        '←': '<-',     # Left arrow
+        '↑': '^',      # Up arrow
+        '↓': 'v',      # Down arrow
+        '✓': '[x]',    # Checkmark
+        '✗': '[_]',    # X mark
+        '×': 'x',      # Multiplication sign
+        '÷': '/',      # Division sign
+        '≈': '~',      # Approximately
+        '≤': '<=',     # Less than or equal
+        '≥': '>=',     # Greater than or equal
+        '≠': '!=',     # Not equal
+        '±': '+/-',    # Plus-minus
+        '°': ' deg',   # Degree symbol
+        '©': '(c)',    # Copyright
+        '®': '(R)',    # Registered
+        '™': '(TM)',   # Trademark
+        '\u200b': '',  # Zero-width space
+        '\u00a0': ' ', # Non-breaking space
+    }
+    
+    for unicode_char, replacement in unicode_replacements.items():
+        text = text.replace(unicode_char, replacement)
     
     # Remove emojis (basic ASCII replacement)
     emoji_pattern = re.compile("["
@@ -352,6 +386,9 @@ def clean_text_for_pdf(text: str) -> str:
         u"\U000024C2-\U0001F251"
         "]+", flags=re.UNICODE)
     text = emoji_pattern.sub('', text)
+    
+    # Final pass: replace any remaining non-ASCII characters
+    text = text.encode('ascii', 'replace').decode('ascii')
     
     return text.strip()
 
