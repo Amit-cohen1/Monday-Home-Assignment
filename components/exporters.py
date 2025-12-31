@@ -8,10 +8,14 @@ Provides functionality to export QBR documents to:
 """
 
 import io
+import os
 import re
 from datetime import datetime
 from typing import Dict, Any, Optional
 from fpdf import FPDF
+
+# Path to Monday.com logo
+LOGO_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'assets', 'Monday-Com-Logo.png')
 
 
 # Monday.com brand colors (RGB)
@@ -134,14 +138,21 @@ class MondayPDF(FPDF):
         self.set_fill_color(*MONDAY_COLORS['primary'])
         self.rect(0, 0, 210, 25, 'F')
         
-        # Logo placeholder (text-based)
-        self.set_font('Helvetica', 'B', 14)
-        self.set_text_color(*MONDAY_COLORS['white'])
-        self.set_xy(10, 8)
-        self.cell(0, 10, 'monday.com', ln=False)
+        # Add Monday.com logo
+        try:
+            if os.path.exists(LOGO_PATH):
+                # Add logo image (scaled to fit header)
+                self.image(LOGO_PATH, x=8, y=5, h=15)
+        except Exception:
+            # Fallback to text if logo fails
+            self.set_font('Helvetica', 'B', 14)
+            self.set_text_color(*MONDAY_COLORS['white'])
+            self.set_xy(10, 8)
+            self.cell(0, 10, 'monday.com', ln=False)
         
         # QBR title
         self.set_font('Helvetica', '', 10)
+        self.set_text_color(*MONDAY_COLORS['white'])
         self.set_xy(150, 8)
         self.cell(0, 10, 'Quarterly Business Review', ln=True)
         
@@ -173,20 +184,28 @@ class MondayPDF(FPDF):
         self.set_fill_color(*MONDAY_COLORS['primary_dark'])
         self.rect(0, 95, 210, 10, 'F')
         
+        # Add Monday.com logo centered at top
+        try:
+            if os.path.exists(LOGO_PATH):
+                # Center the logo (logo width ~60, page width 210)
+                self.image(LOGO_PATH, x=75, y=12, h=20)
+        except Exception:
+            pass  # Skip logo if there's an issue
+        
         # Title
         self.set_font('Helvetica', 'B', 28)
         self.set_text_color(*MONDAY_COLORS['white'])
-        self.set_xy(0, 30)
+        self.set_xy(0, 40)
         self.cell(0, 15, 'Quarterly Business Review', align='C', ln=True)
         
         # Account name
         self.set_font('Helvetica', '', 18)
-        self.set_xy(0, 50)
+        self.set_xy(0, 58)
         self.cell(0, 10, account_name, align='C', ln=True)
         
         # Quarter
         self.set_font('Helvetica', 'B', 14)
-        self.set_xy(0, 70)
+        self.set_xy(0, 75)
         self.cell(0, 10, quarter, align='C', ln=True)
         
         # Subtitle below header
@@ -298,6 +317,7 @@ class MondayPDF(FPDF):
         self.cell(36, 6, label, align='C')
         
         self.set_xy(current_x + 45, current_y)
+    
 
 
 def parse_markdown_to_sections(markdown: str) -> Dict[str, str]:
@@ -336,6 +356,12 @@ def parse_markdown_to_sections(markdown: str) -> Dict[str, str]:
 
 def clean_text_for_pdf(text: str) -> str:
     """Clean markdown syntax and Unicode characters for PDF rendering."""
+    
+    # Remove context indicator emojis and their labels completely
+    # Handle various formats: [🟢 GROWTH OPPORTUNITY], 🟢 GROWTH OPPORTUNITY, etc.
+    text = re.sub(r'\[?\s*🟢\s*GROWTH\s*OPPORTUNITY\s*\]?\s*', '', text)
+    text = re.sub(r'\[?\s*🔴\s*RISK\s*MITIGATION\s*\]?\s*', '', text)
+    
     # Remove markdown formatting
     text = re.sub(r'\*\*(.+?)\*\*', r'\1', text)  # Bold
     text = re.sub(r'\*(.+?)\*', r'\1', text)       # Italic
@@ -343,6 +369,7 @@ def clean_text_for_pdf(text: str) -> str:
     text = re.sub(r'\[(.+?)\]\(.+?\)', r'\1', text)  # Links
     
     # Replace Unicode characters that Helvetica doesn't support
+    # Must do this BEFORE the ASCII encoding to avoid ? replacements
     unicode_replacements = {
         '—': '-',      # Em dash
         '–': '-',      # En dash
@@ -350,6 +377,9 @@ def clean_text_for_pdf(text: str) -> str:
         ''': "'",      # Left single quote
         '"': '"',      # Left double quote
         '"': '"',      # Right double quote
+        '"': '"',      # Another form of quote
+        '„': '"',      # Low double quote
+        '‚': "'",      # Low single quote
         '…': '...',    # Ellipsis
         '•': '*',      # Bullet
         '→': '->',     # Right arrow
@@ -371,12 +401,16 @@ def clean_text_for_pdf(text: str) -> str:
         '™': '(TM)',   # Trademark
         '\u200b': '',  # Zero-width space
         '\u00a0': ' ', # Non-breaking space
+        '\u2018': "'", # Left single quotation mark
+        '\u2019': "'", # Right single quotation mark
+        '\u201c': '"', # Left double quotation mark
+        '\u201d': '"', # Right double quotation mark
     }
     
     for unicode_char, replacement in unicode_replacements.items():
         text = text.replace(unicode_char, replacement)
     
-    # Remove emojis (basic ASCII replacement)
+    # Remove emojis
     emoji_pattern = re.compile("["
         u"\U0001F600-\U0001F64F"
         u"\U0001F300-\U0001F5FF"
@@ -387,8 +421,8 @@ def clean_text_for_pdf(text: str) -> str:
         "]+", flags=re.UNICODE)
     text = emoji_pattern.sub('', text)
     
-    # Final pass: replace any remaining non-ASCII characters
-    text = text.encode('ascii', 'replace').decode('ascii')
+    # Final pass: replace any remaining non-ASCII characters with empty string (not ?)
+    text = text.encode('ascii', 'ignore').decode('ascii')
     
     return text.strip()
 
@@ -489,10 +523,12 @@ def export_to_pdf(
             # Check for bullet points
             if line.strip().startswith('- ') or line.strip().startswith('* '):
                 bullet_text = clean_line.lstrip('- *').strip()
-                pdf.add_bullet_point(bullet_text)
-            elif line.strip().startswith(('1.', '2.', '3.')):
-                # Numbered list
-                pdf.add_bullet_point(clean_line)
+                if bullet_text:
+                    pdf.add_bullet_point(bullet_text)
+            elif re.match(r'^\s*\d+[\.\)]\s', line):
+                # Numbered list (handles both "1." and "1)" formats)
+                if clean_line:
+                    pdf.add_bullet_point(clean_line)
             else:
                 pdf.add_paragraph(clean_line)
         
