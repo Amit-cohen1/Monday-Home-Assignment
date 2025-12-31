@@ -619,11 +619,12 @@ with col1:
         "📁 Upload Customer Data",
         type=["csv", "xlsx"],
         help="Upload your customer dataset (Excel or CSV)",
-        label_visibility="collapsed"
+        label_visibility="collapsed",
+        key="customer_file_uploader"
     )
 
 with col2:
-    use_sample = st.button("🚀 Try Sample Data", use_container_width=True, type="primary")
+    use_sample = st.button("🚀 Try Sample Data", use_container_width=True, type="primary", key="sample_data_button")
     
     # Always show download template button
     sample_path = Path(__file__).parent / "sample_customers_q3_2025.xlsx"
@@ -793,7 +794,9 @@ if df is not None and openai_api_key:
     </div>
     """, unsafe_allow_html=True)
     
-    view_tabs = st.tabs(["🏢 Portfolio Overview", "👤 Single Account QBR", "📦 Batch Generate"])
+    # Tab navigation
+    tab_names = ["🏢 Portfolio Overview", "👤 Single Account QBR", "📦 Batch Generate"]
+    view_tabs = st.tabs(tab_names)
     
     # -------------------------------------------------------------------------
     # TAB 1: PORTFOLIO OVERVIEW
@@ -842,12 +845,28 @@ if df is not None and openai_api_key:
             </style>
             """, unsafe_allow_html=True)
             
+            # Initialize session state for selected account if not exists
+            if 'selected_account' not in st.session_state:
+                st.session_state.selected_account = df['account_name'].tolist()[0]
+            
+            # Use session state to persist selection across reruns
+            account_options = df['account_name'].tolist()
+            
+            # Make sure the stored account is still in the options (in case data changed)
+            if st.session_state.selected_account not in account_options:
+                st.session_state.selected_account = account_options[0]
+            
             selected_account = st.selectbox(
                 "🔍 Choose Account",
-                options=df['account_name'].tolist(),
+                options=account_options,
+                index=account_options.index(st.session_state.selected_account),
+                key="account_selector",
                 help="Select the account you want to analyze",
                 label_visibility="collapsed"
             )
+            
+            # Update session state
+            st.session_state.selected_account = selected_account
             
             # Show risk badge below selector
             if selected_account:
@@ -925,7 +944,8 @@ if df is not None and openai_api_key:
                 generate_btn = st.button(
                     "🚀 Generate QBR Report",
                     use_container_width=True,
-                    type="primary"
+                    type="primary",
+                    key="generate_single_qbr_btn"
                 )
             
             # Check if QBR already generated
@@ -1134,7 +1154,7 @@ if df is not None and openai_api_key:
         st.caption(f"⏱️ Estimated time: ~{estimated_time} seconds for {len(selected_accounts)} accounts")
         
         # Generate button
-        if st.button("🚀 Generate All QBRs", use_container_width=True, type="primary"):
+        if st.button("🚀 Generate All QBRs", use_container_width=True, type="primary", key="generate_batch_qbrs_btn"):
             
             if not selected_accounts:
                 st.warning("Please select at least one account")

@@ -323,17 +323,29 @@ def create_portfolio_risk_pie(accounts_df: pd.DataFrame) -> go.Figure:
 
 def render_account_metrics(client_data: Dict[str, Any]) -> None:
     """Render comprehensive metrics dashboard for a single account"""
+    # Preferred channel with icon
+    channel = client_data['preferred_channel']
+    channel_icons = {
+        'Email': '📧',
+        'Chat': '💬',
+        'In-App': '📱',
+        'Phone': '📞',
+        'Slack': '💬'
+    }
+    channel_icon = channel_icons.get(channel, '📨')
+    
     # Account header
     st.markdown(f"""
     <div style="background: linear-gradient(135deg, {COLORS['primary']} 0%, {COLORS['purple']} 100%);
                 padding: 1.5rem 2rem; border-radius: 16px; margin-bottom: 1.5rem; color: white;">
         <h2 style="margin: 0; font-size: 1.8rem;">{client_data['account_name']}</h2>
-        <div style="display: flex; gap: 1rem; margin-top: 0.5rem; align-items: center;">
+        <div style="display: flex; gap: 1rem; margin-top: 0.5rem; align-items: center; flex-wrap: wrap;">
             <span style="background: rgba(255,255,255,0.2); padding: 0.25rem 0.75rem; border-radius: 12px; 
                         font-size: 0.875rem; font-weight: 600;">{client_data['plan_type']}</span>
-            <span style="opacity: 0.9;">{client_data['active_users']} active users</span>
+            <span style="opacity: 0.9;">👥 {client_data['active_users']} active users</span>
             <span style="opacity: 0.9;">•</span>
-            <span style="opacity: 0.9;">Prefers {client_data['preferred_channel']}</span>
+            <span style="background: rgba(255,255,255,0.15); padding: 0.25rem 0.75rem; border-radius: 12px; 
+                        font-size: 0.875rem;">{channel_icon} Prefers {channel}</span>
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -367,25 +379,64 @@ def render_account_metrics(client_data: Dict[str, Any]) -> None:
             tpu_color = COLORS['danger']
             tpu_label = "High"
         
+        # Response time assessment (industry standard: <2h is good)
+        response_time = client_data['avg_response_time']
+        if response_time <= 1:
+            rt_color = COLORS['success']
+            rt_status = "Excellent"
+        elif response_time <= 2:
+            rt_color = COLORS['success']
+            rt_status = "Good"
+        elif response_time <= 4:
+            rt_color = COLORS['warning']
+            rt_status = "Needs Attention"
+        else:
+            rt_color = COLORS['danger']
+            rt_status = "Slow"
+        
+        # Preferred channel with icon
+        channel = client_data['preferred_channel']
+        channel_icons = {
+            'Email': '📧',
+            'Chat': '💬',
+            'In-App': '📱',
+            'Phone': '📞',
+            'Slack': '💬'
+        }
+        channel_icon = channel_icons.get(channel, '📨')
+        
+        # Channel speed indicator
+        slow_channels = ['Email']
+        fast_channels = ['Chat', 'In-App', 'Slack']
+        if channel in slow_channels and response_time > 2:
+            channel_hint = f"<div style='font-size: 0.65rem; color: {COLORS['warning']}; margin-top: 0.25rem;'>💡 Consider Chat for faster response</div>"
+        else:
+            channel_hint = ""
+        
         st.markdown(f"""
-        <div class="metric-card" style="background: var(--app-bg-card); border-radius: 12px; padding: 1.25rem; text-align: center;
+        <div class="metric-card" style="background: var(--app-bg-card); border-radius: 12px; padding: 1rem; text-align: center;
                     box-shadow: 0 2px 8px var(--app-shadow); border: 1px solid var(--app-border); height: 220px; display: flex;
                     flex-direction: column; justify-content: center; align-items: center;">
-            <div style="font-size: 2.5rem; font-weight: 700; color: var(--app-text-primary);">
+            <div style="font-size: 2rem; font-weight: 700; color: var(--app-text-primary);">
                 {tickets}
             </div>
-            <div style="color: var(--app-text-secondary); font-size: 0.85rem; margin-top: 0.25rem;">
+            <div style="color: var(--app-text-secondary); font-size: 0.8rem;">
                 Support Tickets
             </div>
-            <div style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--app-border); width: 100%;">
+            <div style="margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid var(--app-border); width: 100%;">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <span style="font-size: 0.75rem; color: var(--app-text-secondary);">Per User:</span>
-                    <span style="font-size: 0.9rem; font-weight: 600; color: {tpu_color};">{tickets_per_user:.2f} ({tpu_label})</span>
+                    <span style="font-size: 0.7rem; color: var(--app-text-secondary);">Per User:</span>
+                    <span style="font-size: 0.8rem; font-weight: 600; color: {tpu_color};">{tickets_per_user:.2f}</span>
                 </div>
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.25rem;">
-                    <span style="font-size: 0.75rem; color: var(--app-text-secondary);">Avg Response:</span>
-                    <span style="font-size: 0.85rem; color: var(--app-text-primary);">{client_data['avg_response_time']}h</span>
+                    <span style="font-size: 0.7rem; color: var(--app-text-secondary);">Response:</span>
+                    <span style="font-size: 0.8rem; font-weight: 600; color: {rt_color};">{response_time}h ({rt_status})</span>
                 </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.25rem;">
+                    <span style="font-size: 0.7rem; color: var(--app-text-secondary);">Channel:</span>
+                    <span style="font-size: 0.8rem; font-weight: 600; color: var(--app-text-primary);">{channel_icon} {channel}</span>
+                </div>
+                {channel_hint}
             </div>
         </div>
         """, unsafe_allow_html=True)
