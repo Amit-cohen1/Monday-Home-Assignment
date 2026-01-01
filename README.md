@@ -4,7 +4,7 @@
 
 ### AI-Powered Quarterly Business Reviews for Customer Success
 
-[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://monday-qbr-autodrafter.streamlit.app)
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://monday-home-assignment-dukh3vgeh7a9mpydzfvpax.streamlit.app/)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![OpenAI GPT-5.2](https://img.shields.io/badge/OpenAI-GPT--5.2-00A67E.svg)](https://openai.com)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
