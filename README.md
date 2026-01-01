@@ -317,7 +317,6 @@ See [prompts/qbr_prompts.py](prompts/qbr_prompts.py) for full implementation.
 
 ## 🙏 Acknowledgments
 
-- Built for the **monday.com Innovation Builder Assessment**
 - Powered by [OpenAI](https://openai.com) GPT models
 - UI framework by [Streamlit](https://streamlit.io)
 - Charts by [Plotly](https://plotly.com)
@@ -326,7 +325,6 @@ See [prompts/qbr_prompts.py](prompts/qbr_prompts.py) for full implementation.
 
 <div align="center">
 
-**Built with ❤️ for Customer Success teams**
 
 [⬆ Back to top](#-qbr-auto-drafter)
 
