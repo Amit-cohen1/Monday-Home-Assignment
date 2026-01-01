@@ -1,0 +1,345 @@
+<mxfile host="app.diagrams.net" modified="2025-01-01T12:00:00.000Z" agent="draw.io" version="22.1.0">
+  <diagram name="QBR Auto-Drafter Architecture" id="qbr-architecture">
+    <mxGraphModel dx="1434" dy="780" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        
+        <!-- Title -->
+        <mxCell id="title" value="&lt;b&gt;QBR Auto-Drafter - System Architecture&lt;/b&gt;&lt;br&gt;AI-Powered Quarterly Business Review Generation" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="400" y="20" width="400" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- USER LAYER -->
+        <mxCell id="user-layer" value="USER LAYER" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=1;fontSize=11;fontColor=#6161FF;" vertex="1" parent="1">
+          <mxGeometry x="40" y="70" width="100" height="20" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="user" value="👤 CSM User" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fillColor=#6161FF;strokeColor=#3700CC;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="60" y="100" width="40" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Streamlit App Container -->
+        <mxCell id="streamlit-container" value="" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=#6161FF;strokeWidth=2;fillColor=none;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="140" y="80" width="320" height="160" as="geometry" />
+        </mxCell>
+        
+        <mxCell id="streamlit-label" value="&lt;b&gt;Streamlit Web Application&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#6161FF;" vertex="1" parent="1">
+          <mxGeometry x="200" y="85" width="150" height="20" as="geometry" />
+        </mxCell>
+
+        <mxCell id="password" value="🔐&lt;br&gt;Password&lt;br&gt;Auth" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="155" y="115" width="60" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="upload" value="📁&lt;br&gt;Data&lt;br&gt;Upload" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="225" y="115" width="60" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="select" value="🔍&lt;br&gt;Account&lt;br&gt;Selection" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="295" y="115" width="60" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="generate-btn" value="🚀&lt;br&gt;Generate&lt;br&gt;QBR" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#6161FF;strokeColor=#3700CC;fontColor=#ffffff;fontSize=9;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="365" y="115" width="60" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Tabs -->
+        <mxCell id="tabs" value="Portfolio Overview | Single Account QBR | Batch Generate" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=8;" vertex="1" parent="1">
+          <mxGeometry x="155" y="175" width="270" height="25" as="geometry" />
+        </mxCell>
+
+        <!-- Settings -->
+        <mxCell id="settings" value="⚙️ Model: gpt-5.2&lt;br&gt;Temp: 0.3" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=8;" vertex="1" parent="1">
+          <mxGeometry x="155" y="205" width="80" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- DATA LAYER -->
+        <mxCell id="data-layer" value="DATA LAYER" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=1;fontSize=11;fontColor=#0066CC;" vertex="1" parent="1">
+          <mxGeometry x="500" y="70" width="100" height="20" as="geometry" />
+        </mxCell>
+
+        <mxCell id="csv-input" value="📊 Excel/CSV&lt;br&gt;Customer Data" style="shape=document;whiteSpace=wrap;html=1;boundedLbl=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="500" y="100" width="80" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="pandas" value="🐼 Pandas&lt;br&gt;DataFrame" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=10;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="610" y="100" width="70" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="client-data" value="Client Data Dict&lt;br&gt;&lt;font style=&quot;font-size: 7px&quot;&gt;• metrics&lt;br&gt;• crm_notes&lt;br&gt;• feedback&lt;/font&gt;" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=8;align=left;spacingLeft=5;" vertex="1" parent="1">
+          <mxGeometry x="610" y="175" width="80" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- VISUALIZATION -->
+        <mxCell id="dashboard" value="📈 Dashboard&lt;br&gt;&lt;font style=&quot;font-size: 8px&quot;&gt;Plotly Charts&lt;br&gt;Metric Cards&lt;br&gt;Risk Indicators&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="500" y="175" width="90" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- AI PROCESSING LAYER - Main Section -->
+        <mxCell id="ai-layer" value="AI PROCESSING LAYER" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=1;fontSize=11;fontColor=#00CA72;" vertex="1" parent="1">
+          <mxGeometry x="40" y="270" width="150" height="20" as="geometry" />
+        </mxCell>
+
+        <!-- AI Container -->
+        <mxCell id="ai-container" value="" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=#00CA72;strokeWidth=2;fillColor=#d5e8d4;fillOpacity=20;dashed=0;" vertex="1" parent="1">
+          <mxGeometry x="40" y="295" width="650" height="200" as="geometry" />
+        </mxCell>
+
+        <!-- Prompts -->
+        <mxCell id="prompts" value="📝 &lt;b&gt;Prompt Templates&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size: 8px&quot;&gt;• SYSTEM_PROMPT&lt;br&gt;• FULL_QBR_PROMPT&lt;br&gt;• VALIDATOR_PROMPT&lt;/font&gt;" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=9;align=left;spacingLeft=5;" vertex="1" parent="1">
+          <mxGeometry x="55" y="310" width="110" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="rules" value="🔒 Internal Rules&lt;br&gt;&lt;font style=&quot;font-size: 7px&quot;&gt;• Churn Detection&lt;br&gt;• Upsell Logic&lt;br&gt;• Channel Optimization&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=8;dashed=1;align=left;spacingLeft=5;" vertex="1" parent="1">
+          <mxGeometry x="55" y="390" width="110" height="55" as="geometry" />
+        </mxCell>
+
+        <!-- QBR Generator -->
+        <mxCell id="generator" value="🤖 &lt;b&gt;QBR Generator&lt;/b&gt;&lt;br&gt;generate_qbr_validated()" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#6161FF;strokeColor=#3700CC;fontColor=#ffffff;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="190" y="320" width="130" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Main LLM -->
+        <mxCell id="main-llm" value="🧠 Main LLM&lt;br&gt;&lt;b&gt;gpt-5.2&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size: 8px&quot;&gt;~$0.001/call&lt;/font&gt;" style="ellipse;whiteSpace=wrap;html=1;fillColor=#00CA72;strokeColor=#006600;fontColor=#ffffff;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="350" y="310" width="90" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- QBR Output -->
+        <mxCell id="qbr-draft" value="📄 QBR&lt;br&gt;Markdown&lt;br&gt;Draft" style="shape=document;whiteSpace=wrap;html=1;boundedLbl=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="470" y="315" width="70" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Validator -->
+        <mxCell id="validator" value="🔎 &lt;b&gt;Validator&lt;/b&gt;&lt;br&gt;gpt-4o-mini&lt;br&gt;&lt;font style=&quot;font-size: 7px&quot;&gt;~$0.0003/call&lt;/font&gt;" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FDAB3D;strokeColor=#CC6600;fontColor=#ffffff;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="560" y="310" width="90" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- Decision -->
+        <mxCell id="decision" value="Pass?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="575" y="400" width="60" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Validation Checks -->
+        <mxCell id="checks" value="✅ Validation Checks&lt;br&gt;&lt;font style=&quot;font-size: 7px&quot;&gt;• Critical signals addressed&lt;br&gt;• All feedback covered&lt;br&gt;• No hallucinations&lt;br&gt;• Format compliant&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=8;align=left;spacingLeft=5;" vertex="1" parent="1">
+          <mxGeometry x="190" y="395" width="120" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- Retry Loop -->
+        <mxCell id="retry" value="🔄 Retry&lt;br&gt;&lt;font style=&quot;font-size: 8px&quot;&gt;with hints&lt;br&gt;(max 2x)&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="350" y="405" width="70" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- OUTPUT LAYER -->
+        <mxCell id="output-layer" value="OUTPUT LAYER" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=1;fontSize=11;fontColor=#E2445C;" vertex="1" parent="1">
+          <mxGeometry x="40" y="510" width="100" height="20" as="geometry" />
+        </mxCell>
+
+        <!-- Validation Result -->
+        <mxCell id="validation-result" value="✅ Validation&lt;br&gt;Result&lt;br&gt;&lt;font style=&quot;font-size: 7px&quot;&gt;Score: 85/100&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="140" y="535" width="80" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- QBR Display -->
+        <mxCell id="qbr-display" value="📋 QBR Display&lt;br&gt;&lt;font style=&quot;font-size: 8px&quot;&gt;• Executive Summary&lt;br&gt;• Metrics &amp; Wins&lt;br&gt;• Recommendations&lt;br&gt;• Next Steps&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#6161FF;strokeColor=#3700CC;fontColor=#ffffff;fontSize=9;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="250" y="525" width="120" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- Export Options -->
+        <mxCell id="export-pdf" value="📕 PDF&lt;br&gt;&lt;font style=&quot;font-size: 7px&quot;&gt;Branded&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E2445C;strokeColor=#990000;fontColor=#ffffff;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="400" y="535" width="60" height="45" as="geometry" />
+        </mxCell>
+
+        <mxCell id="export-md" value="📄 MD&lt;br&gt;&lt;font style=&quot;font-size: 7px&quot;&gt;Markdown&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="470" y="535" width="60" height="45" as="geometry" />
+        </mxCell>
+
+        <!-- External Services -->
+        <mxCell id="external-layer" value="EXTERNAL SERVICES" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=1;fontSize=11;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="750" y="70" width="130" height="20" as="geometry" />
+        </mxCell>
+
+        <mxCell id="openai-cloud" value="☁️ OpenAI API" style="ellipse;shape=cloud;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="740" y="100" width="120" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="streamlit-cloud" value="☁️ Streamlit&lt;br&gt;Cloud" style="ellipse;shape=cloud;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="740" y="190" width="120" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="secrets" value="🔐 Secrets&lt;br&gt;&lt;font style=&quot;font-size: 7px&quot;&gt;API_KEY&lt;br&gt;PASSWORD&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=8;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="765" y="280" width="70" height="45" as="geometry" />
+        </mxCell>
+
+        <!-- ARROWS / CONNECTIONS -->
+        <!-- User to App -->
+        <mxCell id="arrow1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#333333;strokeWidth=1;" edge="1" parent="1" source="user" target="password">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- App flow -->
+        <mxCell id="arrow2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#6161FF;strokeWidth=1;" edge="1" parent="1" source="password" target="upload">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#6161FF;strokeWidth=1;" edge="1" parent="1" source="upload" target="select">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#6161FF;strokeWidth=1;" edge="1" parent="1" source="select" target="generate-btn">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Data flow -->
+        <mxCell id="arrow5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#0066CC;strokeWidth=1;" edge="1" parent="1" source="csv-input" target="pandas">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#0066CC;strokeWidth=1;" edge="1" parent="1" source="pandas" target="client-data">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#0066CC;strokeWidth=1;" edge="1" parent="1" source="pandas" target="dashboard">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Generate to AI -->
+        <mxCell id="arrow8" value="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#00CA72;strokeWidth=2;fontColor=#00CA72;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="generate-btn" target="generator">
+          <mxGeometry x="-0.5" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Client data to Generator -->
+        <mxCell id="arrow9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#d6b656;strokeWidth=1;dashed=1;" edge="1" parent="1" source="client-data" target="generator">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="650" y="260" />
+              <mxPoint x="255" y="260" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- AI Processing Flow -->
+        <mxCell id="arrow10" value="2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#00CA72;strokeWidth=2;fontColor=#00CA72;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="generator" target="main-llm">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow11" value="3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#00CA72;strokeWidth=2;fontColor=#00CA72;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="main-llm" target="qbr-draft">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow12" value="4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#00CA72;strokeWidth=2;fontColor=#00CA72;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="qbr-draft" target="validator">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow13" value="5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#FDAB3D;strokeWidth=2;fontColor=#CC6600;labelBackgroundColor=#ffffff;" edge="1" parent="1" source="validator" target="decision">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Decision arrows -->
+        <mxCell id="arrow14" value="No" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#E2445C;strokeWidth=1;fontColor=#E2445C;" edge="1" parent="1" source="decision" target="retry">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow15" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#E2445C;strokeWidth=1;dashed=1;" edge="1" parent="1" source="retry" target="generator">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="385" y="480" />
+              <mxPoint x="170" y="480" />
+              <mxPoint x="170" y="345" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="arrow16" value="Yes" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#00CA72;strokeWidth=2;fontColor=#00CA72;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1" source="decision" target="validation-result">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="605" y="510" />
+              <mxPoint x="180" y="510" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Output flow -->
+        <mxCell id="arrow17" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#6161FF;strokeWidth=1;" edge="1" parent="1" source="validation-result" target="qbr-display">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow18" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#E2445C;strokeWidth=1;" edge="1" parent="1" source="qbr-display" target="export-pdf">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow19" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#0066CC;strokeWidth=1;" edge="1" parent="1" source="qbr-display" target="export-md">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- OpenAI connections -->
+        <mxCell id="arrow20" value="API" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#666666;strokeWidth=1;dashed=1;fontColor=#666666;fontSize=8;" edge="1" parent="1" source="main-llm" target="openai-cloud">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="395" y="290" />
+              <mxPoint x="720" y="290" />
+              <mxPoint x="720" y="135" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="arrow21" value="API" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#666666;strokeWidth=1;dashed=1;fontColor=#666666;fontSize=8;" edge="1" parent="1" source="validator" target="openai-cloud">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="720" y="345" />
+              <mxPoint x="720" y="135" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Legend -->
+        <mxCell id="legend-box" value="" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=#666666;strokeWidth=1;fillColor=#fafafa;dashed=0;" vertex="1" parent="1">
+          <mxGeometry x="740" y="350" width="140" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-title" value="&lt;b&gt;Legend&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="780" y="355" width="60" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="legend1" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#6161FF;strokeColor=#3700CC;" vertex="1" parent="1">
+          <mxGeometry x="750" y="380" width="15" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="legend1-text" value="UI / Generation" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=8;" vertex="1" parent="1">
+          <mxGeometry x="770" y="380" width="80" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="legend2" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#00CA72;strokeColor=#006600;" vertex="1" parent="1">
+          <mxGeometry x="750" y="400" width="15" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="legend2-text" value="AI Processing" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=8;" vertex="1" parent="1">
+          <mxGeometry x="770" y="400" width="80" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="legend3" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FDAB3D;strokeColor=#CC6600;" vertex="1" parent="1">
+          <mxGeometry x="750" y="420" width="15" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="legend3-text" value="Validation" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=8;" vertex="1" parent="1">
+          <mxGeometry x="770" y="420" width="80" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="legend4" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E2445C;strokeColor=#990000;" vertex="1" parent="1">
+          <mxGeometry x="750" y="440" width="15" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="legend4-text" value="Export / Retry" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=8;" vertex="1" parent="1">
+          <mxGeometry x="770" y="440" width="80" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="legend5" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="750" y="460" width="15" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="legend5-text" value="Data" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=8;" vertex="1" parent="1">
+          <mxGeometry x="770" y="460" width="80" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="legend6" value="→" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10;fontColor=#00CA72;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="750" y="480" width="15" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="legend6-text" value="Main Flow (1-5)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=8;" vertex="1" parent="1">
+          <mxGeometry x="770" y="480" width="80" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="legend7" value="--→" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=8;fontColor=#E2445C;" vertex="1" parent="1">
+          <mxGeometry x="750" y="500" width="15" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="legend7-text" value="Retry Loop" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=8;" vertex="1" parent="1">
+          <mxGeometry x="770" y="500" width="80" height="15" as="geometry" />
+        </mxCell>
+
+        <!-- Footer -->
+        <mxCell id="footer" value="monday.com QBR Auto-Drafter | Innovation Builder Assessment | Built with Streamlit + LangChain + OpenAI" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=9;fontColor=#999999;" vertex="1" parent="1">
+          <mxGeometry x="250" y="605" width="500" height="20" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
+

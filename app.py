@@ -21,7 +21,8 @@ from components.dashboard import (
     render_portfolio_overview,
     COLORS
 )
-from components.qbr_generator import QBRGenerator
+from components.qbr_generator import QBRGenerator, QBROutput
+from components.validator import ValidationResult, format_validation_status_html
 from components.exporters import (
     get_markdown_download_data,
     get_pdf_download_data,
@@ -952,26 +953,173 @@ if df is not None and openai_api_key:
             cached_qbr = st.session_state.generated_qbrs.get(selected_account)
             
             if generate_btn or cached_qbr:
+                validation_result = None
+                
                 if generate_btn:
-                    # Generate new QBR
-                    with st.spinner(f"Analyzing {selected_account} and generating insights..."):
-                        try:
-                            generator = QBRGenerator(
-                                api_key=openai_api_key,
-                                model=model_option,
-                                temperature=temperature
-                            )
-                            
-                            qbr_output = generator.generate_structured_qbr(client_data)
-                            
-                            # Cache the result
-                            st.session_state.generated_qbrs[selected_account] = qbr_output
-                            
-                        except Exception as e:
-                            st.error(f"Error generating QBR: {e}")
-                            st.stop()
+                    # Generate new QBR with engaging loading experience
+                    loading_container = st.empty()
+                    
+                    # Friendly loading messages for different stages
+                    loading_stages = {
+                        'start': [
+                            f"🔍 Diving into {selected_account}'s data...",
+                            f"📊 Analyzing usage patterns and health signals...",
+                            f"🎯 Identifying what matters most for {selected_account}..."
+                        ],
+                        'generating': [
+                            "✨ Crafting personalized insights...",
+                            "💡 Connecting the dots between metrics and strategy...",
+                            "📝 Writing recommendations your client will love...",
+                            "🎨 Putting the finishing touches on your QBR..."
+                        ],
+                        'validating': [
+                            "🔎 Double-checking all the facts...",
+                            "✅ Making sure we didn't miss anything important...",
+                            "🛡️ Validating quality and accuracy..."
+                        ],
+                        'regenerating': [
+                            "🔄 Refining for better quality...",
+                            "✨ Making it even better based on feedback..."
+                        ]
+                    }
+                    
+                    # Use a dict to store state (avoids nonlocal issues)
+                    loading_state = {'stage': 'start', 'index': 0}
+                    
+                    def render_loading(message: str, stage: str = 'generating'):
+                        """Render a beautiful loading animation with the current message."""
+                        # Determine the icon based on stage
+                        stage_icons = {
+                            'start': '🔍',
+                            'generating': '✨',
+                            'validating': '🔎',
+                            'regenerating': '🔄',
+                            'success': '✅',
+                            'warning': '⚠️'
+                        }
+                        
+                        loading_container.markdown(f"""
+                        <div style="
+                            background: linear-gradient(135deg, rgba(97, 97, 255, 0.1) 0%, rgba(0, 202, 114, 0.1) 100%);
+                            border: 1px solid rgba(97, 97, 255, 0.3);
+                            border-radius: 16px;
+                            padding: 2rem;
+                            text-align: center;
+                            margin: 1rem 0;
+                        ">
+                            <div style="
+                                display: inline-block;
+                                width: 60px;
+                                height: 60px;
+                                border: 4px solid rgba(97, 97, 255, 0.2);
+                                border-top: 4px solid #6161FF;
+                                border-radius: 50%;
+                                animation: spin 1s linear infinite;
+                                margin-bottom: 1rem;
+                            "></div>
+                            <div style="
+                                font-size: 1.1rem;
+                                font-weight: 500;
+                                color: var(--app-text-primary);
+                                margin-bottom: 0.5rem;
+                            ">
+                                {message}
+                            </div>
+                            <div style="
+                                font-size: 0.85rem;
+                                color: var(--app-text-secondary);
+                            ">
+                                This usually takes 10-15 seconds
+                            </div>
+                        </div>
+                        <style>
+                            @keyframes spin {{
+                                0% {{ transform: rotate(0deg); }}
+                                100% {{ transform: rotate(360deg); }}
+                            }}
+                        </style>
+                        """, unsafe_allow_html=True)
+                    
+                    def update_progress(msg: str):
+                        """Map technical messages to friendly ones."""
+                        # Determine stage from message
+                        if 'Generating' in msg and 'attempt 1' in msg:
+                            loading_state['stage'] = 'generating'
+                            messages = loading_stages['generating']
+                        elif 'Generating' in msg and 'attempt 2' in msg:
+                            loading_state['stage'] = 'regenerating'
+                            messages = loading_stages['regenerating']
+                        elif 'Validating' in msg:
+                            loading_state['stage'] = 'validating'
+                            messages = loading_stages['validating']
+                        elif 'issues' in msg.lower() or 'regenerating' in msg.lower():
+                            loading_state['stage'] = 'regenerating'
+                            messages = loading_stages['regenerating']
+                        else:
+                            messages = loading_stages.get(loading_state['stage'], loading_stages['generating'])
+                        
+                        # Get a friendly message (cycle through them)
+                        friendly_msg = messages[loading_state['index'] % len(messages)]
+                        loading_state['index'] += 1
+                        
+                        render_loading(friendly_msg, loading_state['stage'])
+                    
+                    try:
+                        generator = QBRGenerator(
+                            api_key=openai_api_key,
+                            model=model_option,
+                            temperature=temperature
+                        )
+                        
+                        # Show initial loading state
+                        render_loading(loading_stages['start'][0], 'start')
+                        
+                        # Use validated generation with circuit breaker
+                        qbr_markdown, validation_result = generator.generate_qbr_validated(
+                            client_data,
+                            progress_callback=update_progress
+                        )
+                        
+                        # Build structured output using the validated markdown
+                        # (without making another API call)
+                        story_type = generator.classify_story_type(client_data)
+                        key_metrics = generator._extract_metrics(client_data)
+                        risks = generator._identify_risks(client_data)
+                        recommendations = generator._build_recommendations(client_data)
+                        next_steps = generator._build_next_steps(client_data, story_type)
+                        confidence = generator._calculate_confidence(client_data)
+                        exec_summary = generator._extract_summary(qbr_markdown, client_data)
+                        
+                        qbr_output = QBROutput(
+                            account_name=client_data.get('account_name', 'Unknown'),
+                            executive_summary=exec_summary,
+                            story_type=story_type,
+                            key_metrics=key_metrics,
+                            risks=risks,
+                            recommendations=recommendations,
+                            next_steps=next_steps,
+                            confidence_score=confidence,
+                            raw_markdown=qbr_markdown
+                        )
+                        
+                        # Cache the result along with validation
+                        st.session_state.generated_qbrs[selected_account] = qbr_output
+                        st.session_state[f"validation_{selected_account}"] = validation_result
+                        
+                        # Clear loading animation
+                        loading_container.empty()
+                        
+                    except Exception as e:
+                        loading_container.empty()
+                        st.error(f"Error generating QBR: {e}")
+                        st.stop()
                 else:
                     qbr_output = cached_qbr
+                    validation_result = st.session_state.get(f"validation_{selected_account}")
+                
+                # Display validation status
+                if validation_result:
+                    st.markdown(format_validation_status_html(validation_result), unsafe_allow_html=True)
                 
                 # Display results
                 st.markdown("<div style='height: 1rem;'></div>", unsafe_allow_html=True)

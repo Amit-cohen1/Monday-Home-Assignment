@@ -26,6 +26,7 @@ from prompts.qbr_prompts import (
     get_insight_prompt,
     get_recommendation_prompt
 )
+from components.validator import QBRValidator, ValidationResult
 
 
 # ============================================================================
@@ -88,8 +89,11 @@ class QBRGenerator:
     - Configurable model and temperature
     - Structured output parsing
     - Multi-stage generation pipeline
+    - Mandatory validation with circuit breaker
     - Error handling and fallbacks
     """
+    
+    MAX_REGENERATION_ATTEMPTS = 2  # Circuit breaker: max retries before showing with warnings
     
     def __init__(
         self,
@@ -112,10 +116,14 @@ class QBRGenerator:
         )
         self.model = model
         self.temperature = temperature
+        self.api_key = api_key
+        
+        # Initialize validator with lightweight model
+        self.validator = QBRValidator(api_key=api_key, model="gpt-4o-mini")
     
     def generate_qbr_markdown(self, client_data: Dict[str, Any]) -> str:
         """
-        Generate a complete QBR in markdown format.
+        Generate a complete QBR in markdown format (without validation).
         
         Args:
             client_data: Dictionary containing all customer data fields
@@ -128,6 +136,111 @@ class QBRGenerator:
         messages = [
             SystemMessage(content=SYSTEM_PROMPT),
             HumanMessage(content=prompt)
+        ]
+        
+        response = self.llm.invoke(messages)
+        return response.content
+    
+    def generate_qbr_validated(
+        self, 
+        client_data: Dict[str, Any],
+        progress_callback: Optional[callable] = None
+    ) -> tuple[str, ValidationResult]:
+        """
+        Generate a QBR with mandatory validation and circuit breaker.
+        
+        This is the recommended method for production use.
+        Implements the circuit breaker pattern:
+        - Attempt 1: Generate → Validate
+        - Attempt 2 (if failed): Regenerate with hints → Validate
+        - If still failed: Return QBR with validation warnings
+        
+        Args:
+            client_data: Dictionary containing all customer data fields
+            progress_callback: Optional callback for progress updates (receives message string)
+            
+        Returns:
+            Tuple of (qbr_markdown, ValidationResult)
+        """
+        def update_progress(msg: str):
+            if progress_callback:
+                progress_callback(msg)
+        
+        last_validation_result = None
+        qbr_content = None
+        
+        for attempt in range(1, self.MAX_REGENERATION_ATTEMPTS + 1):
+            update_progress(f"Generating QBR (attempt {attempt}/{self.MAX_REGENERATION_ATTEMPTS})...")
+            
+            # Generate QBR
+            if attempt == 1:
+                qbr_content = self.generate_qbr_markdown(client_data)
+            else:
+                # Regenerate with improvement hints from previous validation
+                qbr_content = self._regenerate_with_hints(
+                    client_data, 
+                    last_validation_result
+                )
+            
+            update_progress("Validating QBR quality...")
+            
+            # Validate the generated QBR
+            validation_result = self.validator.validate(qbr_content, client_data)
+            last_validation_result = validation_result
+            
+            # If validation passed, return immediately
+            if validation_result.passed:
+                update_progress(f"✅ Validation passed (score: {validation_result.overall_score}/100)")
+                return qbr_content, validation_result
+            
+            # If validation failed but we have more attempts, continue
+            if attempt < self.MAX_REGENERATION_ATTEMPTS:
+                update_progress(f"⚠️ Validation found issues, regenerating...")
+        
+        # Circuit breaker triggered: return QBR with warnings
+        update_progress(
+            f"⚠️ Validation issues remain after {self.MAX_REGENERATION_ATTEMPTS} attempts. "
+            "Showing QBR with warnings for manual review."
+        )
+        
+        return qbr_content, last_validation_result
+    
+    def _regenerate_with_hints(
+        self, 
+        client_data: Dict[str, Any],
+        validation_result: ValidationResult
+    ) -> str:
+        """
+        Regenerate QBR with improvement hints from failed validation.
+        
+        Args:
+            client_data: Original client data
+            validation_result: Previous failed validation result
+            
+        Returns:
+            Regenerated QBR markdown
+        """
+        # Get the base prompt
+        base_prompt = get_full_qbr_prompt(client_data)
+        
+        # Get improvement hints from validator
+        hints = self.validator.get_regeneration_hints(validation_result)
+        
+        # Append hints to the prompt
+        enhanced_prompt = f"""{base_prompt}
+
+---
+
+## ⚠️ IMPORTANT: Previous attempt had validation issues. Please fix:
+
+{hints}
+
+Generate a corrected QBR that addresses ALL the issues above.
+"""
+        
+        messages = [
+            SystemMessage(content=SYSTEM_PROMPT),
+            HumanMessage(content=enhanced_prompt)
         ]
         
         response = self.llm.invoke(messages)
