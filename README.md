@@ -13,7 +13,7 @@
 
 **Transform 5+ hours of QBR preparation into 5 minutes**
 
-[Live Demo](https://monday-qbr-autodrafter.streamlit.app) · [Architecture](#-architecture) · [Documentation](#-documentation)
+[Live Demo](https://monday-home-assignment-dukh3vgeh7a9mpydzfvpax.streamlit.app/) · [Architecture](#-architecture) · [Documentation](#-documentation)
 
 </div>
 
